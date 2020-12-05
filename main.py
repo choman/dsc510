@@ -61,7 +61,8 @@ def getRequiredFeet(company_name=None):
 #           fiber optic cable
 def calculateCost(feet=0):
     cost = feet * CABLE_PRICE
-    print (f"\nThe price for {feet} of fiber optic cable is: ${cost:.2f}")
+    cost = f"${cost:.2f}"
+    print (f"\nThe price for {feet} of fiber optic cable is: {cost}")
 
     return cost
 
@@ -69,18 +70,18 @@ def printReceipt(data):
     now = datetime.datetime.now()
     date = f'{now:%Y-%m-%d %H:%M}'
     print(data)
-    pad = " "
+    pad = ''
 
     receipt = f"""
-{data['company_name']}
-{date}
+               Bozo's Fiber World
+                {date}
 
 Item                                       Price
 ----------------------                     -------
-Fiber Optic Cable: {data['feet']}ft{pad:10}${data['cost']:.2f}
+Fiber Optic Cable: {data['feet']}ft{data['cost']:>23}
 
 ----------------------                     -------
-Total                                      ${data['cost']:.2f}
+Total                                      {data['cost']}
 
 Thank you! Please come again.
 """
