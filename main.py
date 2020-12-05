@@ -76,11 +76,13 @@ def printReceipt(data):
 {date}
 
 Item                                       Price
-----------------------                     ------------------
-Fiber Optic Cable: {data['feet']}{pad:>16}    ${data['cost']:.2f}
+----------------------                     -------
+Fiber Optic Cable: {data['feet']}ft{pad:10}${data['cost']:.2f}
 
-----------------------                     ------------------
+----------------------                     -------
 Total                                      ${data['cost']:.2f}
+
+Thank you! Please come again.
 """
 
     print(f"{receipt}")
