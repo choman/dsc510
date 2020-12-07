@@ -19,16 +19,17 @@ import sys
 
 CABLE_PRICE = 0.87
 
+
 # function: main()
 # abstract: Main program
 def main():
-    data = {}
+    receipt_info = {}
 
-    data['company_name'] = getCompanyName()
-    data['feet'] = getRequiredFeet(data['company_name'])
-    data['cost'] = calculateCost(data['feet'])
+    receipt_info['company_name'] = getCompanyName()
+    receipt_info['feet'] = getRequiredFeet(receipt_info['company_name'])
+    receipt_info['cost'] = calculateCost(receipt_info['feet'])
 
-    printReceipt(data)
+    printReceipt(receipt_info)
 
 # function: getCompanyName()
 # abstract: Get company name
@@ -66,22 +67,27 @@ def calculateCost(feet=0):
 
     return cost
 
-def printReceipt(data):
+def printReceipt(receipt_info):
     now = datetime.datetime.now()
     date = f'{now:%Y-%m-%d %H:%M}'
-    print(data)
+    print(receipt_info)
     pad = ''
 
+    
+    # Heredoc as my receipt
     receipt = f"""
                Bozo's Fiber World
-                {date}
+               ==================
+
+Company: {receipt_info['company_name']}
+Date:    {date}
 
 Item                                       Price
 ----------------------                     -------
-Fiber Optic Cable: {data['feet']}ft{data['cost']:>23}
+Fiber Optic Cable: {receipt_info['feet']}ft{receipt_info['cost']:>23}
 
 ----------------------                     -------
-Total                                      {data['cost']}
+Total                                      {receipt_info['cost']}
 
 Thank you! Please come again.
 """
