@@ -22,6 +22,7 @@ CABLE_PRICE = 0.87
 
 # function: main()
 # abstract: Main program
+#
 def main():
     receipt_info = {}
 
@@ -31,16 +32,18 @@ def main():
 
     printReceipt(receipt_info)
 
-# function: getCompanyName()
-# abstract: Get company name
+# Function: getCompanyName
+# Abstract: Get company name
+#
 def getCompanyName():
     greet_msg    = "Greetings, what is your company name? "
     company_name = input(greet_msg)
 
     return company_name
 
-# function: getRequiredFeet()
-# abstract: Get length of fiber optic cable in feet
+# Function: getRequiredFeet
+# Abstract: Get length of fiber optic cable in feet
+#
 def getRequiredFeet(company_name=None):
     while True:
         ans = input(f"Welcome from {company_name}, how many feet of fiber optic cable do you need? ")
@@ -57,9 +60,11 @@ def getRequiredFeet(company_name=None):
         if 'y' in ans.lower():
             return feet
 
-# function: calculateCost()
-# abstract: Calculate the cost of the request length of
+
+# Function: calculateCost
+# Abstract: Calculate the cost of the request length of
 #           fiber optic cable
+#
 def calculateCost(feet=0):
     cost = feet * CABLE_PRICE
     cost = f"${cost:.2f}"
@@ -67,6 +72,9 @@ def calculateCost(feet=0):
 
     return cost
 
+# Function: printReceipt
+# Abstract: display receipt
+#
 def printReceipt(receipt_info):
     now = datetime.datetime.now()
     date = f'{now:%Y-%m-%d %H:%M}'
@@ -84,7 +92,7 @@ Date:    {date}
 
 Item                                       Price
 ----------------------                     -------
-Fiber Optic Cable: {receipt_info['feet']}ft{receipt_info['cost']:>23}
+Fiber Optic Cable: {receipt_info['feet']}ft{pad:<10}{receipt_info['cost']:>23}
 
 ----------------------                     -------
 Total                                      {receipt_info['cost']}
@@ -100,6 +108,7 @@ Thank you! Please come again.
 if __name__ == "__main__":
     try:
         main()
+
     except KeyboardInterrupt:
         print()
         pass
