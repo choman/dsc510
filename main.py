@@ -34,7 +34,7 @@ def main():
 # function: getCompanyName()
 # abstract: Get company name
 def getCompanyName():
-    greet_msg = "Greetings, what is your company names? "
+    greet_msg    = "Greetings, what is your company name? "
     company_name = input(greet_msg)
 
     return company_name
@@ -49,7 +49,7 @@ def getRequiredFeet(company_name=None):
             feet = float(ans)
 
         except:
-            print ("Invalid response, please enter required feet")
+            print("Invalid response, please enter required feet")
             continue
 
         ans = input(f"You are asking for {feet} of fiber optic cable [Y/n]: ")
@@ -63,7 +63,7 @@ def getRequiredFeet(company_name=None):
 def calculateCost(feet=0):
     cost = feet * CABLE_PRICE
     cost = f"${cost:.2f}"
-    print (f"\nThe price for {feet} of fiber optic cable is: {cost}")
+    print(f"\nThe price for {feet} of fiber optic cable is: {cost}")
 
     return cost
 
@@ -101,4 +101,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        print()
         pass
