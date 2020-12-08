@@ -18,6 +18,7 @@ import datetime
 import sys
 
 CABLE_PRICE = 0.87
+DEBUG       = False
 
 
 # function: main()
@@ -72,20 +73,19 @@ def calculateCost(feet=0):
 
     return cost
 
+def printDebug(msg=None):
+    if DEBUG:
+        print(f"{msg}")
+
 # Function: printReceipt
 # Abstract: display receipt
 #
 def printReceipt(receipt_info):
     now  = datetime.datetime.now()
     date = f'{now:%Y-%m-%d %H:%M}'
-    pad  = ''
-
-    padlen = 10 - len(receipt_info['cost'])
-    print (padlen)
-
-    print(receipt_info)
-
     item = f"Fiber Optic Cable: {receipt_info['feet']}"
+
+    printDebug(receipt_info)
 
     #{\'Fiber Optic Cable: {receipt_info['feet']}\':20}{receipt_info['cost']:>20}
     # Heredoc as my receipt
@@ -105,10 +105,7 @@ Date:    {date}
 
 Thank you! Please come again.
 """
-
     print(f"{receipt}")
-
-
 
 
 if __name__ == "__main__":
