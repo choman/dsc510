@@ -76,12 +76,18 @@ def calculateCost(feet=0):
 # Abstract: display receipt
 #
 def printReceipt(receipt_info):
-    now = datetime.datetime.now()
+    now  = datetime.datetime.now()
     date = f'{now:%Y-%m-%d %H:%M}'
-    print(receipt_info)
-    pad = ''
+    pad  = ''
 
-    
+    padlen = 10 - len(receipt_info['cost'])
+    print (padlen)
+
+    print(receipt_info)
+
+    item = f"Fiber Optic Cable: {receipt_info['feet']}"
+
+    #{\'Fiber Optic Cable: {receipt_info['feet']}\':20}{receipt_info['cost']:>20}
     # Heredoc as my receipt
     receipt = f"""
                Bozo's Fiber World
@@ -90,12 +96,12 @@ def printReceipt(receipt_info):
 Company: {receipt_info['company_name']}
 Date:    {date}
 
-Item                                       Price
-----------------------                     -------
-Fiber Optic Cable: {receipt_info['feet']}ft{pad:<10}{receipt_info['cost']:>23}
+{"Item":30}{"Price":>10}
+{"----------------------":30}{"-----":>10}
+{item:30}{receipt_info['cost']:>10}
 
-----------------------                     -------
-Total                                      {receipt_info['cost']}
+{"----------------------":30}{"-----":>10}
+{"Total":30}{receipt_info['cost']:>10}
 
 Thank you! Please come again.
 """
