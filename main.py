@@ -21,6 +21,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2020-12-14        Added missing discount for > 500
 #  Chad Homan     2020-12-14        Added initial discount code
 #  Chad Homan     2020-12-09        Flush out issues with receipt display
 #
@@ -29,8 +30,9 @@ import datetime
 import sys
 
 CABLE_PRICE     = 0.87
-CABLE_PRICE_100 = 0.70
-CABLE_PRICE_250 = 0.50
+CABLE_PRICE_100 = 0.80
+CABLE_PRICE_250 = 0.70
+CABLE_PRICE_500 = 0.50
 DEBUG           = False
 
 
@@ -79,7 +81,10 @@ def getRequiredFeet(company_name=None):
 # Abstract: Get length of fiber optic cable in feet
 #
 def getPricePerFoot(receiptInfo):
-    if receiptInfo['feet'] > 250:
+    if receiptInfo['feet'] > 500:
+        price = CABLE_PRICE_500
+
+    elif receiptInfo['feet'] > 250:
         price = CABLE_PRICE_250
 
     elif receiptInfo['feet'] > 100:
