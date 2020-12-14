@@ -13,12 +13,20 @@
 #    Calculate the installation cost of fiber optic cable by multiplying the total cost as the number of feet times $0.87.
 #    Print a receipt for the user including the company name, number of feet of fiber to be installed, the calculated cost, and total cost in a legible format.
 #    Include appropriate comments throughout  program.
-
+#
+#  Record of Modifications:
+#
+#    Author         Date         Description
+#   ---------     ----------     -
+#   Chad Homan    2020-12-14
+#
 import datetime
 import sys
 
-CABLE_PRICE = 0.87
-DEBUG       = False
+CABLE_PRICE     = 0.87
+CABLE_PRICE_100 = 0.70
+CABLE_PRICE_250 = 0.50
+DEBUG           = False
 
 
 # function: main()
@@ -29,7 +37,8 @@ def main():
 
     receipt_info['company_name'] = getCompanyName()
     receipt_info['feet'] = getRequiredFeet(receipt_info['company_name'])
-    receipt_info['cost'] = calculateCost(receipt_info['feet'])
+    receipt_info['price'] = getPricePerFoot(receipt_info)
+    receipt_info['cost'] = calculateCost(receipt_info)
 
     printReceipt(receipt_info)
 
@@ -61,15 +70,30 @@ def getRequiredFeet(company_name=None):
         if 'y' in ans.lower():
             return feet
 
+# Function: getPricePerFoot
+# Abstract: Get length of fiber optic cable in feet
+#
+def getPricePerFoot(receiptInfo):
+    if receiptInfo['feet'] > 250:
+        price = CABLE_PRICE_250
+
+    elif receiptInfo['feet'] > 100:
+        price = CABLE_PRICE_100
+
+    else:
+        price = CABLE_PRICE
+
+    return price
+
 
 # Function: calculateCost
 # Abstract: Calculate the cost of the request length of
 #           fiber optic cable
 #
-def calculateCost(feet=0):
-    cost = feet * CABLE_PRICE
+def calculateCost(receiptInfo):
+    cost = receiptInfo['feet'] * receiptInfo['price']
     cost = f"${cost:.2f}"
-    print(f"\nThe price for {feet} of fiber optic cable is: {cost}")
+    print(f"\nThe price for {receiptInfo['feet']} of fiber optic cable is: {cost}")
 
     return cost
 
@@ -95,6 +119,7 @@ def printReceipt(receipt_info):
 
 Company: {receipt_info['company_name']}
 Date:    {date}
+Price:   ${receipt_info['price']:.2f}/ft
 
 {"Item":30}{"Price":>10}
 {"----------------------":30}{"-----":>10}
