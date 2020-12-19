@@ -21,6 +21,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2020-12-19        Changed CABLE_PRICE to CABLE_PRICE_STD
 #  Chad Homan     2020-12-14        Added missing discount for > 500
 #  Chad Homan     2020-12-14        Added initial discount code
 #  Chad Homan     2020-12-09        Flush out issues with receipt display
@@ -29,7 +30,7 @@
 import datetime
 import sys
 
-CABLE_PRICE     = 0.87
+CABLE_PRICE_STD = 0.87
 CABLE_PRICE_100 = 0.80
 CABLE_PRICE_250 = 0.70
 CABLE_PRICE_500 = 0.50
@@ -91,10 +92,9 @@ def getPricePerFoot(receiptInfo):
         price = CABLE_PRICE_100
 
     else:
-        price = CABLE_PRICE
+        price = CABLE_PRICE_STD
 
     return price
-
 
 # Function: calculateCost
 # Abstract: Calculate the cost of the request length of
@@ -107,6 +107,9 @@ def calculateCost(receiptInfo):
 
     return cost
 
+# Function: printDebug
+# Abstract: Wrapper arounf print for debugging messages
+#
 def printDebug(msg=None):
     if DEBUG:
         print(f"{msg}")
