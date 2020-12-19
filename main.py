@@ -1,9 +1,12 @@
 # DSC 510
-# Week 1
-# Programming Assignment Week 1
+# Week 3
+# Programming Assignment Week 3
 # Author: Chad Homan
 # 2020/12/05
 #
+# Abstract: This programming takes in basic company info and lenth of fiber cable. 
+#           Calculates the cost of the cable based on length and if discounts apply.
+#           Then displays a receipt for the company's purchase.
 #
 # Create a program with the following requirements:
 #  * Using comments, create a header at the top of the program indicating the purpose of
@@ -22,8 +25,9 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2020-12-19        Changed CABLE_PRICE to CABLE_PRICE_STD
+#                                   Added program abstract
 #  Chad Homan     2020-12-14        Added missing discount for > 500
-#  Chad Homan     2020-12-14        Added initial discount code
+#                                   Added initial discount code
 #  Chad Homan     2020-12-09        Flush out issues with receipt display
 #
 
