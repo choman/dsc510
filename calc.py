@@ -41,14 +41,52 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-01-05        Initial header and code
+#                                   updated comments- line up
+#                                   Added initial menu
 #
 
 import datetime
 import sys
 
+actions = {
+    "1": "Perform Calculation",
+    "2": "Calculate Average",
+}
+
+calc_options = ["+", "-", "*", "/"]
+
 
 def main():
-    pass
+    while True:
+        printMenu()
+        action = input("Selection: ")
+        processAction(action)
+
+def printMenu():
+    print("what would you like to do:\n")
+    
+    for key, value in actions.items():
+        print(f"   ({key}) {value}")
+    
+    print()
+    print("   (q) quit\n")
+
+def processAction(action=None):
+    if action is None:
+        pass
+    
+    if action == "1":
+        beginCalculation()
+
+    elif action == "2":
+        beginAverage()
+
+    elif action == "q".lower():
+        sys.exit()
+
+    else:
+        print("Invalid Selection, please choose again")
+
 
 if __name__ == "__main__":
     try:
