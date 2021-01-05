@@ -43,6 +43,8 @@
 #  Chad Homan     2021-01-05        Initial header and code
 #                                   updated comments- line up
 #                                   Added initial menu
+#                                   Added initial average code - needs 
+#                                         breaking up
 #
 
 import datetime
@@ -87,6 +89,43 @@ def processAction(action=None):
     else:
         print("Invalid Selection, please choose again")
 
+
+def beginAverage():
+    numbers = []
+
+    while True:
+        try:
+            count = int(input("\nHow many numbers to average? "))
+
+            if count <= 0:
+                print("Please enter a positive number greater then 0")
+
+            else:
+                break
+
+        except ValueError:
+            print("Invalid entry, please enter an integer")
+
+    for x in range(count):
+        digit = input("Enter numner: ")
+        if testInt(digit):
+            numbers.append(int(digit))
+        else:
+            print("Bad number, please enter positive number")
+
+    total = sum(numbers)
+    average = total / count
+    print(numbers)
+    print(f"Sum:     {total}")
+    print(f"Average: {average}")
+
+def testInt(value):
+    try:
+        float(value)
+    except ValueError:
+        return False
+    else:
+        return float(value).is_integer()
 
 if __name__ == "__main__":
     try:
