@@ -55,7 +55,12 @@ actions = {
     "2": "Calculate Average",
 }
 
-calc_options = ["+", "-", "*", "/"]
+calc_options = {
+    "+": "Addition", 
+    "-": "Subtraction", 
+    "*": "Multiplication", 
+    "/": "Division",
+}
 
 
 def main():
@@ -81,7 +86,7 @@ def processAction(action=None):
         beginCalculation()
 
     elif action == "2":
-        beginAverage()
+        calculateAverage()
 
     elif action == "q".lower():
         sys.exit()
@@ -89,8 +94,53 @@ def processAction(action=None):
     else:
         print("Invalid Selection, please choose again")
 
+def beginCalculation():
+    printCalcMenu()
+    action = input("Selection: ")
+    processCalcOption(action)
 
-def beginAverage():
+def performCalculation(action):
+    numbers = input(f"Please enter two numbers to ({action})? ")
+    num1, num2 = numbers.split(' ')
+    num1 = int(num1)
+    num2 = int(num2)
+    mesg = f"{num1} {action} {num2}"
+    
+    if "+" in action:
+        ans = num1 + num2
+
+    elif "-" in action:
+        ans = num1 - num2
+
+    elif "*" in action:
+        ans = num1 * num2
+
+    elif "/" in action:
+        ans = num1 / num2
+
+    else:
+        print("Invalid action")
+
+    print(f"{mesg}: {ans}\n\n")
+
+
+def processCalcOption(action):
+
+    if action in calc_options.keys():
+        performCalculation(action)
+    else:
+        print("Invalid Selection, please choose again")
+
+def printCalcMenu():
+    print("what would you like to do:\n")
+    
+    for key, value in calc_options.items():
+        print(f"   ({key}) {value}")
+    
+    print()
+
+
+def calculateAverage():
     numbers = []
 
     while True:
@@ -113,9 +163,17 @@ def beginAverage():
         else:
             print("Bad number, please enter positive number")
 
-    total = sum(numbers)
-    average = total / count
-    print(numbers)
+    total, average = getTotalAndAverage(numbers)
+    printAverages(numbers, total, average)
+
+def getTotalAndAverage(numbers):
+    total   = sum(numbers)
+    average = total / len(numbers)
+
+    return total, average
+
+def printAverages(numbers, total, average):
+    print(f"Numbers: {', '.join(numbers.str())}")
     print(f"Sum:     {total}")
     print(f"Average: {average}")
 
