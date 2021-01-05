@@ -45,6 +45,8 @@
 #                                   Added initial menu
 #                                   Added initial average code - needs 
 #                                         breaking up
+#                                   Added initial calc code - needs 
+#                                         test and tweaking
 #
 
 import datetime
