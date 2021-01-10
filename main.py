@@ -4,26 +4,30 @@
 # Author: Chad Homan
 # 2020/12/05
 #
-# Abstract: This programming takes in basic company info and lenth of fiber cable. 
-#           Calculates the cost of the cable based on length and if discounts apply.
-#           Then displays a receipt for the company's purchase.
+# Abstract: This programming takes in basic company info and lenth of fiber
+#           cable. Calculates the cost of the cable based on length and if
+#           discounts apply. Then displays a receipt for the company's
+#           purchase.
 #
 # Create a program with the following requirements:
-#  * Using comments, create a header at the top of the program indicating the purpose of
-#    the program, assignment number, and your name. Refer to the submission instructions
-#    for an example of a header.
+#  * Using comments, create a header at the top of the program indicating the
+#    purpose of the program, assignment number, and your name. Refer to the
+#    submission instructions for an example of a header.
 #  * Display a welcome message for your user.
 #  * Retrieve the company name from the user.
-#  * Retrieve the number of feet of fiber optic cable to be installed from the user.
-#  * Calculate the installation cost of fiber optic cable by multiplying the total cost
-#    as the number of feet times $0.87.
-#  * Print a receipt for the user including the company name, number of feet of fiber to
-#    be installed, the calculated cost, and total cost in a legible format.
+#  * Retrieve the number of feet of fiber optic cable to be installed from the
+#    user.
+#  * Calculate the installation cost of fiber optic cable by multiplying the
+#    total cost as the number of feet times $0.87.
+#  * Print a receipt for the user including the company name, number of feet
+#    of fiber to be installed, the calculated cost, and total cost in a
+#    legible format.
 #  * Include appropriate comments throughout  program.
 #
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-10        Fixed some linter issues
 #  Chad Homan     2020-12-19        Changed CABLE_PRICE to CABLE_PRICE_STD
 #                                   Added program abstract
 #  Chad Homan     2020-12-14        Added missing discount for > 500
@@ -68,12 +72,13 @@ def getCompanyName():
 #
 def getRequiredFeet(company_name=None):
     while True:
-        ans = input(f"Welcome from {company_name}, how many feet of fiber optic cable do you need? ")
+        ans = input(f"Welcome from {company_name}, how many feet of "
+                    "fiber optic cable do you need? ")
 
         try:
             feet = float(ans)
 
-        except:
+        except ValueError:
             print("Invalid response, please enter required feet")
             continue
 
@@ -107,7 +112,8 @@ def getPricePerFoot(receiptInfo):
 def calculateCost(receiptInfo):
     cost = receiptInfo['feet'] * receiptInfo['price']
     cost = f"${cost:.2f}"
-    print(f"\nThe price for {receiptInfo['feet']} of fiber optic cable is: {cost}")
+    print(f"\nThe price for {receiptInfo['feet']} of "
+          "fiber optic cable is: {cost}")
 
     return cost
 
@@ -128,7 +134,8 @@ def printReceipt(receipt_info):
 
     printDebug(receipt_info)
 
-    #{\'Fiber Optic Cable: {receipt_info['feet']}\':20}{receipt_info['cost']:>20}
+    # {\'Fiber Optic Cable: {receipt_info['feet']}\':20}
+    # {receipt_info['cost']:>20}
     # Heredoc as my receipt
     receipt = f"""
                Bozo's Fiber World
