@@ -50,7 +50,6 @@
 #                                         test and tweaking
 #
 
-import datetime
 import sys
 
 actions = {
@@ -77,7 +76,7 @@ def main():
 
 
 # function: printMenu()
-# abstract: print simple menu 
+# abstract: print simple menu
 #
 def printMenu():
     print("what would you like to do:\n")
@@ -110,7 +109,7 @@ def processAction(action=None):
 
 
 # function: beginCalculation()
-# abstract: initialize calculation 
+# abstract: initialize calculation
 #
 def beginCalculation():
     printCalcMenu()
@@ -220,7 +219,7 @@ def printAverages(numbers, total, average):
 
 # function: testInt()
 # abstract: verify the numbers entered are int's
-#           The is example code from the internet, I forgot 
+#           The is example code from the internet, I forgot
 #           from where.
 #
 def testInt(value):
