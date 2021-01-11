@@ -41,6 +41,7 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-01-10        Added function headers, linted
+#                                   resolved issue in printAverages
 #  Chad Homan     2021-01-05        Initial header and code
 #                                   updated comments- line up
 #                                   Added initial menu
@@ -142,7 +143,7 @@ def performCalculation(action):
     else:
         print("Invalid action")
 
-    print(f"{mesg}: {ans}\n\n")
+    print(f"Results: {mesg}: {ans}\n\n")
 
 
 # function: performCalcOption()
@@ -212,9 +213,14 @@ def getTotalAndAverage(numbers):
 # abstract: print results of the averages
 #
 def printAverages(numbers, total, average):
-    print(f"Numbers: {', '.join(numbers.str())}")
+    tmp = []
+    [tmp.append(str(x)) for x in numbers]
+
+    print()
+    print(f"Numbers: {', '.join(tmp)}")
     print(f"Sum:     {total}")
     print(f"Average: {average}")
+    print()
 
 
 # function: testInt()
