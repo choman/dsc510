@@ -125,7 +125,7 @@ def beginCalculation():
 def performCalculation(action):
     numbers = input(f"Please enter two numbers to ({action})? ")
     tmp = numbers.split(' ')
-    
+
     if len(tmp) > 2:
         print("WARNING: too many entries, calculating only first two")
 
@@ -147,7 +147,7 @@ def performCalculation(action):
             print("WARNING: Cannot divide by zero (0)")
             print()
             return
-        
+
         ans = num1 / num2
 
     else:
