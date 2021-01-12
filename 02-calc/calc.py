@@ -40,6 +40,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-12        Doing research and discovered operator
+#                                   module
 #  Chad Homan     2021-01-12        Consolidated two functions into one
 #                                   Corrected divide by zero error
 #  Chad Homan     2021-01-10        Added function headers, linted
@@ -54,6 +56,7 @@
 #
 
 import sys
+import operator
 
 actions = {
     "1": "Perform Calculation",
@@ -65,6 +68,13 @@ calc_options = {
     "-": "Subtraction",
     "*": "Multiplication",
     "/": "Division",
+}
+
+ops = {
+    "+": operator.add,
+    "-": operator.sub,
+    "*": operator.mul,
+    "/": operator.truediv,
 }
 
 
@@ -119,6 +129,14 @@ def beginCalculation():
     processCalcOption(action)
 
 
+# function: printMsg()
+# abstract: function to print messages
+#
+def printMsg(msg):
+    print(f"{msg}")
+    print()
+
+
 # function: performCalculation()
 # abstract: perfom calculation of two numbers
 #
@@ -129,29 +147,24 @@ def performCalculation(action):
     if len(tmp) > 2:
         print("WARNING: too many entries, calculating only first two")
 
-    num1 = int(tmp[0])
-    num2 = int(tmp[1])
-    mesg = f"{num1} {action} {num2}"
-
-    if "+" in action:
-        ans = num1 + num2
-
-    elif "-" in action:
-        ans = num1 - num2
-
-    elif "*" in action:
-        ans = num1 * num2
-
-    elif "/" in action:
-        if num2 == 0:
-            print("WARNING: Cannot divide by zero (0)")
-            print()
-            return
-
-        ans = num1 / num2
-
+    if testInt(tmp[0]):
+        num1 = int(tmp[0])
     else:
-        print("Invalid action")
+        printMsg(f"WARNING: Not a valid integer: {tmp[1]}")
+        return
+
+    if testInt(tmp[1]):
+        num2 = int(tmp[1])
+    else:
+        printMsg(f"WARNING: Not a valid integer: {tmp[1]}")
+        return
+
+    if "/" in action and num2 == 0:
+        printMsg("WARNING: Cannot divide by zero (0)")
+        return
+
+    mesg = f"{num1} {action} {num2}"
+    ans = ops[action](num1, num2)
 
     print(f"Results: {mesg}: {ans}\n\n")
 
