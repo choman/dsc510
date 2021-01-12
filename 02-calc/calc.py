@@ -41,7 +41,8 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-01-12        Doing research and discovered operator
-#                                   module
+#                                       module
+#                                   Improved input validation
 #  Chad Homan     2021-01-12        Consolidated two functions into one
 #                                   Corrected divide by zero error
 #  Chad Homan     2021-01-10        Added function headers, linted
@@ -50,9 +51,9 @@
 #                                   updated comments- line up
 #                                   Added initial menu
 #                                   Added initial average code - needs
-#                                         breaking up
+#                                       breaking up
 #                                   Added initial calc code - needs
-#                                         test and tweaking
+#                                       test and tweaking
 #
 
 import sys
@@ -84,7 +85,7 @@ ops = {
 def main():
     while True:
         printMenu(actions)
-        action = input("Selection: ")
+        action = input("Selection: ").strip()
         processAction(action)
 
 
@@ -125,7 +126,7 @@ def processAction(action=None):
 #
 def beginCalculation():
     printMenu(calc_options)
-    action = input("Selection: ")
+    action = input("Selection: ").strip()
     processCalcOption(action)
 
 
@@ -141,11 +142,12 @@ def printMsg(msg):
 # abstract: perfom calculation of two numbers
 #
 def performCalculation(action):
-    numbers = input(f"Please enter two numbers to ({action})? ")
+    numbers = input(f"Please enter two numbers separted by spaces: ")
     tmp = numbers.split(' ')
 
-    if len(tmp) > 2:
-        print("WARNING: too many entries, calculating only first two")
+    if not len(tmp) == 2:
+        printMsg("WARNING: require two and only two entries")
+        return
 
     if testInt(tmp[0]):
         num1 = int(tmp[0])
