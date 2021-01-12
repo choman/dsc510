@@ -40,6 +40,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-12        Consolidated two functions into one
+#                                   Corrected divide by zero error
 #  Chad Homan     2021-01-10        Added function headers, linted
 #                                   resolved issue in printAverages
 #  Chad Homan     2021-01-05        Initial header and code
@@ -71,7 +73,7 @@ calc_options = {
 #
 def main():
     while True:
-        printMenu()
+        printMenu(actions)
         action = input("Selection: ")
         processAction(action)
 
@@ -79,11 +81,10 @@ def main():
 # function: printMenu()
 # abstract: print simple menu
 #
-def printMenu():
+def printMenu(menu):
     print("what would you like to do:\n")
 
-    for key, value in actions.items():
-        print(f"   ({key}) {value}")
+    [print(f"   ({key}) {value}") for key, value in menu.items()]
 
     print()
     print("   (q) quit\n")
@@ -113,7 +114,7 @@ def processAction(action=None):
 # abstract: initialize calculation
 #
 def beginCalculation():
-    printCalcMenu()
+    printMenu(calc_options)
     action = input("Selection: ")
     processCalcOption(action)
 
@@ -123,9 +124,13 @@ def beginCalculation():
 #
 def performCalculation(action):
     numbers = input(f"Please enter two numbers to ({action})? ")
-    num1, num2 = numbers.split(' ')
-    num1 = int(num1)
-    num2 = int(num2)
+    tmp = numbers.split(' ')
+    
+    if len(tmp) > 2:
+        print("WARNING: too many entries, calculating only first two")
+
+    num1 = int(tmp[0])
+    num2 = int(tmp[1])
     mesg = f"{num1} {action} {num2}"
 
     if "+" in action:
@@ -138,6 +143,11 @@ def performCalculation(action):
         ans = num1 * num2
 
     elif "/" in action:
+        if num2 == 0:
+            print("WARNING: Cannot divide by zero (0)")
+            print()
+            return
+        
         ans = num1 / num2
 
     else:
@@ -155,18 +165,6 @@ def processCalcOption(action):
         performCalculation(action)
     else:
         print("Invalid Selection, please choose again")
-
-
-# function: printCalcMenu()
-# abstract: if the user selects calc, determine type of calc
-#
-def printCalcMenu():
-    print("what would you like to do:\n")
-
-    for key, value in calc_options.items():
-        print(f"   ({key}) {value}")
-
-    print()
 
 
 # function: calculateAverage()
