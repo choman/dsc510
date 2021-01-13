@@ -40,6 +40,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-13        Added areEntriesValid()
 #  Chad Homan     2021-01-12        Doing research and discovered operator
 #                                       module
 #                                   Improved input validation
@@ -71,7 +72,7 @@ calc_options = {
     "/": "Division",
 }
 
-ops = {
+math_options = {
     "+": operator.add,
     "-": operator.sub,
     "*": operator.mul,
@@ -118,7 +119,7 @@ def processAction(action=None):
         sys.exit()
 
     else:
-        print("Invalid Selection, please choose again")
+        printWarningMsg("Invalid Selection, please choose again")
 
 
 # function: beginCalculation()
@@ -133,40 +134,49 @@ def beginCalculation():
 # function: printMsg()
 # abstract: function to print messages
 #
-def printMsg(msg):
-    print(f"{msg}")
+def printWarningMsg(msg):
+    print(f"WARNING: {msg}")
     print()
+    print()
+
+
+# function: areEntriesValid()
+# abstract: perfom valid tests on entries
+#
+def areEntriesValid(action=None, entries=None):
+    valid = True
+
+    if not len(entries) == 2:
+        printWarningMsg("Require two and only two entries")
+        valid = False
+
+    for count, value in enumerate(entries, start=1):
+        if not testInt(value):
+            printWarningMsg(f"Not a valid integer #{count}: {value}")
+            valid = False
+
+    return valid
 
 
 # function: performCalculation()
 # abstract: perfom calculation of two numbers
 #
 def performCalculation(action):
+    print()
     numbers = input(f"Please enter two numbers separted by spaces: ")
-    tmp = numbers.split(' ')
+    numbers = numbers.split()
 
-    if not len(tmp) == 2:
-        printMsg("WARNING: require two and only two entries")
+    if not areEntriesValid(entries=numbers):
         return
 
-    if testInt(tmp[0]):
-        num1 = int(tmp[0])
-    else:
-        printMsg(f"WARNING: Not a valid integer: {tmp[1]}")
-        return
-
-    if testInt(tmp[1]):
-        num2 = int(tmp[1])
-    else:
-        printMsg(f"WARNING: Not a valid integer: {tmp[1]}")
-        return
+    num1, num2 = [int(tmp) for tmp in numbers]
 
     if "/" in action and num2 == 0:
-        printMsg("WARNING: Cannot divide by zero (0)")
+        printWarningMsg("Cannot divide by zero (0)")
         return
 
     mesg = f"{num1} {action} {num2}"
-    ans = ops[action](num1, num2)
+    ans = math_options[action](num1, num2)
 
     print(f"Results: {mesg}: {ans}\n\n")
 
@@ -175,11 +185,11 @@ def performCalculation(action):
 # abstract: based on user input, perform that type of calculation
 #
 def processCalcOption(action):
-
-    if action in calc_options.keys():
+    if action in calc_options:
         performCalculation(action)
+
     else:
-        print("Invalid Selection, please choose again")
+        printWarningMsg("Invalid Selection, please choose again")
 
 
 # function: calculateAverage()
@@ -203,8 +213,10 @@ def calculateAverage():
 
     for x in range(count):
         digit = input("Enter numner: ")
+
         if testInt(digit):
             numbers.append(int(digit))
+
         else:
             print("Bad number, please enter positive number")
 
@@ -226,8 +238,7 @@ def getTotalAndAverage(numbers):
 # abstract: print results of the averages
 #
 def printAverages(numbers, total, average):
-    tmp = []
-    [tmp.append(str(x)) for x in numbers]
+    tmp = [str(x) for x in numbers]
 
     print()
     print(f"Numbers: {', '.join(tmp)}")
