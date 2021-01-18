@@ -243,7 +243,7 @@ def printAverages(numbers, total, average):
     print()
     print(f"Numbers: {', '.join(tmp)}")
     print(f"Sum:     {total}")
-    print(f"Average: {average}")
+    print(f"Average: {average:.02f}")
     print()
 
 
