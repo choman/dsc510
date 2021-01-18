@@ -43,6 +43,7 @@
 #
 
 DONE = "done"
+APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 
 
 # function: main()
@@ -58,13 +59,14 @@ def main():
 def getLocation():
 
     while True:
-       location = input(f"Enter location (zip or city, state): ").strip()
+        location = input(f"Enter location (zip or city, state): ").strip()
 
-       if verifyLocation(location):
-           break
+        if verifyLocation(location):
+            break
 
     print(f"location = {location}")
     return location
+
 
 def verifyLocation(loc):
 
@@ -75,6 +77,7 @@ def verifyLocation(loc):
         pass
 
     return False
+
 
 if __name__ == "__main__":
     try:
