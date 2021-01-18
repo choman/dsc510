@@ -27,6 +27,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-18        added docstrings
+#                                   experimentnig with min/max
 #  Chad Homan     2021-01-17        fixed flake8 linter issues
 #                                   added headers on functions
 #  Chad Homan     2021-01-15        initial code
