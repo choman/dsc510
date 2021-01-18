@@ -13,7 +13,7 @@
 #
 # Create a program with the following requirements:
 #
-#  - Your program must have a header. 
+#  - Your program must have a header.
 #  - Create an empty list called temperatures.
 #  - Allow the user to input a series of temperatures along with a sentinel
 #    value which will stop the user input.
@@ -27,6 +27,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-17        fixed flake8 linter issues
+#                                   added headers on functions
 #  Chad Homan     2021-01-15        initial code
 #
 
@@ -42,10 +44,13 @@ def main():
     printTemps(temperatures)
 
 
+# function: getTemps()
+# abstract: Gather a list of temperature from user input
+#
 def getTemps():
     temperatures = []
     bad          = []
-    
+
     print(f"Enter temperatures, when finished enter: {DONE}\n")
 
     while True:
@@ -53,7 +58,7 @@ def getTemps():
 
         if DONE in temp.lower():
             break
-        
+
         if testTemp(temp):
             temperatures.append(float(temp))
 
@@ -63,18 +68,31 @@ def getTemps():
     return temperatures, bad
 
 
+# function: testTemp()
+# abstract: verify the numbers entered are float's
+#
 def testTemp(temp):
     try:
         float(temp)
         return True
+
     except ValueError:
         return False
 
 
+# function: processTemps()
+# abstract: Currently sorts the list lowest to highest
+#
 def processTemps(temps):
     return sorted(temps)
 
 
+# function: printTemps()
+# abstract: Displays the following infomation
+#           - highest temperature entered
+#           - lowest temperature entered
+#           - number of temperatures entered
+#
 def printTemps(temps):
     count   = len(temps)
     lowest  = temps[0]
@@ -90,5 +108,6 @@ def printTemps(temps):
 if __name__ == "__main__":
     try:
         main()
+
     except KeyboardInterrupt:
         print()
