@@ -32,15 +32,20 @@
 #  Chad Homan     2021-01-15        initial code
 #
 
-DONE = "done"
+DONE      = "done"
+USE_INDEX = False
 
 
 # function: main()
 # abstract: Main program
 #
 def main():
+    """Primary program driver"""
     temperatures, junk = getTemps()
-    temperatures = processTemps(temperatures)
+
+    if USE_INDEX:
+        temperatures = processTemps(temperatures)
+
     printTemps(temperatures)
 
 
@@ -48,6 +53,12 @@ def main():
 # abstract: Gather a list of temperature from user input
 #
 def getTemps():
+    """User input driver
+
+    Gather input from user, done to quit
+    alphanumeric entries are placed into 'bad'
+    """
+
     temperatures = []
     bad          = []
 
@@ -72,6 +83,12 @@ def getTemps():
 # abstract: verify the numbers entered are float's
 #
 def testTemp(temp):
+    """testTemp
+
+    :param temp: item to testG
+    :return: Boolean: True if float or int, False if not
+    """
+
     try:
         float(temp)
         return True
@@ -84,6 +101,12 @@ def testTemp(temp):
 # abstract: Currently sorts the list lowest to highest
 #
 def processTemps(temps):
+    """procesTemps
+
+    :param temps: list of temperature values
+    :return: sorted list of values
+    """
+
     return sorted(temps)
 
 
@@ -94,9 +117,18 @@ def processTemps(temps):
 #           - number of temperatures entered
 #
 def printTemps(temps):
+    """procesTemps
+
+    :param temps: list of temperature values
+    """
     count   = len(temps)
-    lowest  = temps[0]
-    highest = temps[-1]
+
+    if USE_INDEX:
+        lowest  = temps[0]
+        highest = temps[-1]
+    else:
+        lowest  = min(temps)
+        highest = max(temps)
 
     print()
     print(f"Highest Temperature: {highest}")
