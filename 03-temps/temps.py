@@ -1,6 +1,6 @@
 # DSC 510
-# Week 4
-# Programming Assignment Week 4
+# Week 6
+# Programming Assignment Week 6
 # Author: Chad Homan
 # 2021/01/05
 #
