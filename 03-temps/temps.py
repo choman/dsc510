@@ -128,6 +128,7 @@ def printTemps(temps):
     if USE_INDEX:
         lowest  = temps[0]
         highest = temps[-1]
+
     else:
         lowest  = min(temps)
         highest = max(temps)
