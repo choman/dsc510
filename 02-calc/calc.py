@@ -1,6 +1,6 @@
 # DSC 510
-# Week 4
-# Programming Assignment Week 4
+# Week 5
+# Programming Assignment Week 5
 # Author: Chad Homan
 # 2021/01/05
 #
@@ -243,7 +243,7 @@ def printAverages(numbers, total, average):
     print()
     print(f"Numbers: {', '.join(tmp)}")
     print(f"Sum:     {total}")
-    print(f"Average: {average}")
+    print(f"Average: {average:.02f}")
     print()
 
 
