@@ -50,6 +50,7 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-01-25        initial code
+#                                   linted
 #
 
 FILENAME = "gettysburg.txt"
@@ -59,11 +60,63 @@ FILENAME = "gettysburg.txt"
 # abstract: Main program
 #
 def main():
-    temperatures, junk = getTemps()
-    temperatures = processTemps(temperatures)
-    printTemps(temperatures)
+    info = {}
+    data = openFile()
+
+    for line in data:
+        process_line(line, info)
+
+    pretty_print(info)
 
 
+# function: openFile()
+# abstract: read in the file for processing
+#
+def openFile():
+    data = []
+
+    with open(FILENAME) as fp:
+        data = fp.readlines()
+
+    return data
+
+
+# function: process_line()
+# abstract: process the passed in line
+#
+def process_line(line, info):
+    tmp = line.split()
+
+    for item in tmp:
+        if "--" in item:
+            continue
+
+        item = item.lower()
+        item = item.replace(".", "")
+        item = item.replace(",", "")
+
+        add_word(item, info)
+
+
+# function: add_word()
+# abstract: Add word to dict and increment count
+#
+def add_word(word, info):
+    if word not in info:
+        info.setdefault(word, 0)
+
+    info[word] += 1
+
+
+# function: pretty_print()
+# abstract: print list nice and clean
+#
+def pretty_print(info):
+    print(f"Length of dictionary: {len(info)}")
+    print("Word          Count")
+    print("-------------------")
+    for word in sorted(info, key=info.get, reverse=True):
+        print(f"{word:12s}{info[word]:-5d}")
 
 
 if __name__ == "__main__":
