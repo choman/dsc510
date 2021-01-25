@@ -51,7 +51,10 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-01-25        initial code
 #                                   linted
+#                                   added function docstrings
 #
+
+import string
 
 FILENAME = "gettysburg.txt"
 
@@ -61,10 +64,11 @@ FILENAME = "gettysburg.txt"
 #
 def main():
     info = {}
-    data = openFile()
+    # data = openFile()
 
-    for line in data:
-        process_line(line, info)
+    with open(FILENAME) as gba_file:
+        for line in gba_file:
+            process_line(line, info)
 
     pretty_print(info)
 
@@ -73,6 +77,7 @@ def main():
 # abstract: read in the file for processing
 #
 def openFile():
+    """gets the contents of FILENAME"""
     data = []
 
     with open(FILENAME) as fp:
@@ -85,15 +90,25 @@ def openFile():
 # abstract: process the passed in line
 #
 def process_line(line, info):
+    """Process_line: There is some work to be done to process
+    the line: strip off various characters, split out the words,
+    and so on. Parameters are a line and the dictionary. It calls
+    the function add word with each processed word.
+
+    No return value.
+    """
+
     tmp = line.split()
 
     for item in tmp:
         if "--" in item:
             continue
 
-        item = item.lower()
-        item = item.replace(".", "")
-        item = item.replace(",", "")
+        item = item.strip().lower()
+        item = item.strip(string.punctuation)
+        # item = item.lower()
+        # item = item.replace(".", "")
+        # item = item.replace(",", "")
 
         add_word(item, info)
 
@@ -102,6 +117,12 @@ def process_line(line, info):
 # abstract: Add word to dict and increment count
 #
 def add_word(word, info):
+    """add_word: Add each word to the dictionary. Parameters are
+    the word and a dictionary.
+
+    No return value.
+    """
+
     if word not in info:
         info.setdefault(word, 0)
 
@@ -112,9 +133,18 @@ def add_word(word, info):
 # abstract: print list nice and clean
 #
 def pretty_print(info):
+    """Pretty_print: Because formatted printing can be messy and
+    often particular to each situation (meaning that we might
+    need to modify it later), we separated out the printing
+    function. The parameter is a dictionary.
+
+    No return value.
+    """
+
     print(f"Length of dictionary: {len(info)}")
     print("Word          Count")
     print("-------------------")
+
     for word in sorted(info, key=info.get, reverse=True):
         print(f"{word:12s}{info[word]:-5d}")
 
