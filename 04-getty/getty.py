@@ -123,9 +123,7 @@ def add_word(word, info):
     No return value.
     """
 
-    if word not in info:
-        info.setdefault(word, 0)
-
+    info.setdefault(word, 0)
     info[word] += 1
 
 
