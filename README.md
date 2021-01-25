@@ -1,3 +1,3 @@
-# Astract
+# Abstract
 
-Assinments and Term Project
+Assignments and Term Project
