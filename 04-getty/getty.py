@@ -56,7 +56,8 @@
 
 import string
 
-FILENAME = "gettysburg.txt"
+FILENAME   = "gettysburg.txt"
+USE_BUFFER = False
 
 
 # function: main()
@@ -64,11 +65,17 @@ FILENAME = "gettysburg.txt"
 #
 def main():
     info = {}
-    # data = openFile()
+    data = []
 
-    with open(FILENAME) as gba_file:
-        for line in gba_file:
+    if USE_BUFFER:
+        openFile(data)
+        for line in data:
             process_line(line, info)
+
+    else:
+        with open(FILENAME) as gba_file:
+            for line in gba_file:
+                process_line(line, info)
 
     pretty_print(info)
 
@@ -76,14 +83,10 @@ def main():
 # function: openFile()
 # abstract: read in the file for processing
 #
-def openFile():
+def openFile(data1):
     """gets the contents of FILENAME"""
-    data = []
-
     with open(FILENAME) as fp:
-        data = fp.readlines()
-
-    return data
+        data1 = fp.readlines()
 
 
 # function: process_line()
@@ -98,17 +101,12 @@ def process_line(line, info):
     No return value.
     """
 
-    tmp = line.split()
-
-    for item in tmp:
+    for item in line.split():
         if "--" in item:
             continue
 
         item = item.strip().lower()
         item = item.strip(string.punctuation)
-        # item = item.lower()
-        # item = item.replace(".", "")
-        # item = item.replace(",", "")
 
         add_word(item, info)
 
@@ -140,11 +138,11 @@ def pretty_print(info):
     """
 
     print(f"Length of dictionary: {len(info)}")
-    print("Word          Count")
-    print("-------------------")
+    print("  Word          Count")
+    print("  -------------------")
 
     for word in sorted(info, key=info.get, reverse=True):
-        print(f"{word:12s}{info[word]:-5d}")
+        print(f"  {word:<12}{info[word]:>5}")
 
 
 if __name__ == "__main__":
