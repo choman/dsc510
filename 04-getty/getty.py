@@ -83,10 +83,10 @@ def main():
 # function: openFile()
 # abstract: read in the file for processing
 #
-def openFile(data1):
+def openFile(data):
     """gets the contents of FILENAME"""
     with open(FILENAME) as fp:
-        data1 = fp.readlines()
+        data.extend(fp.readlines())
 
 
 # function: process_line()
@@ -138,11 +138,11 @@ def pretty_print(info):
     """
 
     print(f"Length of dictionary: {len(info)}")
-    print("  Word          Count")
-    print("  -------------------")
+    print("Word          Count")
+    print("-------------------")
 
     for word in sorted(info, key=info.get, reverse=True):
-        print(f"  {word:<12}{info[word]:>5}")
+        print(f"{word:<12}{info[word]:>5}")
 
 
 if __name__ == "__main__":
