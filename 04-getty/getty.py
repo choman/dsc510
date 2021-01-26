@@ -49,6 +49,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-01-27        resolved issue reading file into list
+#                                   fixed pretty_print padding
 #  Chad Homan     2021-01-25        initial code
 #                                   linted
 #                                   added function docstrings
