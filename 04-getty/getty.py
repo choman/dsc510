@@ -1,6 +1,6 @@
 # DSC 510
-# Week 8
-# Programming Assignment Week 8
+# Week 9
+# Programming Assignment Week 9
 # Author: Chad Homan
 # 2021/01/05
 #
