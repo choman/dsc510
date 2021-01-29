@@ -56,7 +56,9 @@
 #                                   added function docstrings
 #
 
+import os
 import string
+
 
 FILENAME   = "gettysburg.txt"
 USE_BUFFER = False
@@ -68,6 +70,13 @@ USE_BUFFER = False
 def main():
     info = {}
     data = []
+    filename = None
+
+    ans = greetings()
+
+    if ans > 1:
+        filename = getFilename()
+
 
     if USE_BUFFER:
         openFile(data)
@@ -79,7 +88,60 @@ def main():
             for line in gba_file:
                 process_line(line, info)
 
-    pretty_print(info)
+    if ans == 1 or ans == 3:
+        pretty_print(info)
+
+    if ans > 1 and filename is not None:
+        write_header(filename, info)
+        process_file(filename, info)
+
+
+def getFilename():
+    tmp = "/tmp/"
+
+    while True:
+        path = input("Please enter a filename: ")
+        path = os.path.normpath(path)
+
+        if path.startswith(tmp) and len(path) > len(tmp):
+            break
+
+        if '/' in path or '\\' in path:
+            print("Invalid, please enter just a filename")
+            continue
+
+        break
+
+    return path
+
+
+def greetings():
+    error = "Invalid option, please enter a valid option"
+    msg = """
+How would you like to see the Gettysburg info:
+
+   1) On the Screen
+   2) Output to file
+   3) Output to both
+"""
+    print(f"{msg}")
+
+    while True:
+        ans = input("Enter Selection [1-3]: ")
+
+        try:
+            ans = int(ans)
+
+            if ans < 1 or ans > 3:
+                print(error)
+                continue
+
+            break
+
+        except ValueError:
+            print(error)
+
+    return ans
 
 
 # function: openFile()
@@ -145,6 +207,22 @@ def pretty_print(info):
 
     for word in sorted(info, key=info.get, reverse=True):
         print(f"{word:<12}{info[word]:>5}")
+
+
+def write_header(fname, info):
+    with open(fname, "w") as fp:
+       fp.write(f"Length of dictionary: {len(info)}\n")
+
+
+def process_file(fname, info):
+    with open(fname, "a") as fp:
+        fp.write("Word          Count\n")
+        fp.write("-------------------\n")
+
+        for word in sorted(info, key=info.get, reverse=True):
+            fp.write(f"{word:<12}{info[word]:>5}\n")
+
+    print(f"\nOutput file: {fname}")
 
 
 if __name__ == "__main__":
