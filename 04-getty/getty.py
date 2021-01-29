@@ -72,11 +72,10 @@ def main():
     data = []
     filename = None
 
-    ans = greetings()
+    option = greetings()
 
-    if ans > 1:
+    if option > 1:
         filename = getFilename()
-
 
     if USE_BUFFER:
         openFile(data)
@@ -88,26 +87,31 @@ def main():
             for line in gba_file:
                 process_line(line, info)
 
-    if ans == 1 or ans == 3:
+    if option == 1 or option == 3:
         pretty_print(info)
 
-    if ans > 1 and filename is not None:
+    if option > 1 and filename is not None:
         write_header(filename, info)
         process_file(filename, info)
 
 
 def getFilename():
-    tmp = "/tmp/"
+    tmp   = "/tmp/"
+    error = "Invalid, please enter a filename"
 
     while True:
         path = input("Please enter a filename: ")
         path = os.path.normpath(path)
 
+        if "getty.py" in path or "gettysburg.txt" in path:
+            print(error)
+            continue
+
         if path.startswith(tmp) and len(path) > len(tmp):
             break
 
         if '/' in path or '\\' in path:
-            print("Invalid, please enter just a filename")
+            print(error)
             continue
 
         break
