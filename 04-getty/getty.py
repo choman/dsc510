@@ -49,6 +49,11 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-05        Still playing with the sorting, did not
+#                                   like the multiple loops from the 
+#                                   pretty_print_sorted1(). After some 
+#                                   experimenting, added another function:
+#                                      - pretty_print_sorted2()
 #  Chad Homan     2021-02-02        Added a second sort to make the pretty
 #                                   print sort alphabetically:
 #                                      - pretty_print_sorted1()
@@ -186,7 +191,6 @@ def pretty_print_sorted1(info):
         for i in sorted(v):
             print(f"{i[0]:<12}{i[1]:>5}")
 
-            
 
 # function: pretty_print()
 # abstract: print list nice and clean
@@ -206,7 +210,7 @@ def pretty_print_sorted2(info):
 
     for word in sorted(sorted(info), key=info.get, reverse=True):
         print(f"{word:<12}{info[word]:>5}")
-        
+
 
 if __name__ == "__main__":
     try:
