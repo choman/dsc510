@@ -49,6 +49,9 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-02        Added a second sort to make the pretty
+#                                   print sort alphabetically:
+#                                      - pretty_print_sorted1()
 #  Chad Homan     2021-01-27        resolved issue reading file into list
 #                                   fixed pretty_print padding
 #  Chad Homan     2021-01-25        initial code
@@ -58,8 +61,11 @@
 
 import string
 
-FILENAME   = "gettysburg.txt"
-USE_BUFFER = False
+PRETTY_PRINT         = 0
+PRETTY_PRINT_SORTED1 = 1
+PRETTY_PRINT_SORTED2 = 2
+FILENAME             = "gettysburg.txt"
+USE_BUFFER           = False
 
 
 # function: main()
@@ -79,7 +85,14 @@ def main():
             for line in gba_file:
                 process_line(line, info)
 
-    pretty_print(info)
+    if PRETTY_PRINT == PRETTY_PRINT_SORTED1:
+        pretty_print_sorted1(info)
+
+    elif PRETTY_PRINT == PRETTY_PRINT_SORTED2:
+        pretty_print_sorted2(info)
+
+    else:
+        pretty_print(info)
 
 
 # function: openFile()
@@ -146,6 +159,54 @@ def pretty_print(info):
     for word in sorted(info, key=info.get, reverse=True):
         print(f"{word:<12}{info[word]:>5}")
 
+
+# function: pretty_print_sorted1()
+# abstract: print list nice and clean
+#
+def pretty_print_sorted1(info):
+    """Pretty_print: Because formatted printing can be messy and
+    often particular to each situation (meaning that we might
+    need to modify it later), we separated out the printing
+    function. The parameter is a dictionary.
+
+
+    No return value.
+    """
+
+    print(f"Length of dictionary: {len(info)}")
+    print("Word          Count")
+    print("-------------------")
+
+    mydict = {}
+    for word in sorted(info, key=info.get, reverse=True):
+        mydict.setdefault(info[word], [])
+        mydict[info[word]].append((word, info[word]))
+
+    for k, v in reversed(sorted(mydict.items())):
+        for i in sorted(v):
+            print(f"{i[0]:<12}{i[1]:>5}")
+
+            
+
+# function: pretty_print()
+# abstract: print list nice and clean
+#
+def pretty_print_sorted2(info):
+    """Pretty_print: Because formatted printing can be messy and
+    often particular to each situation (meaning that we might
+    need to modify it later), we separated out the printing
+    function. The parameter is a dictionary.
+
+    No return value.
+    """
+
+    print(f"Length of dictionary: {len(info)}")
+    print("Word          Count")
+    print("-------------------")
+
+    for word in sorted(sorted(info), key=info.get, reverse=True):
+        print(f"{word:<12}{info[word]:>5}")
+        
 
 if __name__ == "__main__":
     try:
