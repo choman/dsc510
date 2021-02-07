@@ -166,7 +166,7 @@ def pretty_print(info):
 
 
 # function: pretty_print_sorted1()
-# abstract: print list nice and clean
+# abstract: print list nice and clean and alphabetical
 #
 def pretty_print_sorted1(info):
     """Pretty_print: Because formatted printing can be messy and
@@ -192,8 +192,8 @@ def pretty_print_sorted1(info):
             print(f"{i[0]:<12}{i[1]:>5}")
 
 
-# function: pretty_print()
-# abstract: print list nice and clean
+# function: pretty_print_sorted2()
+# abstract: print list nice and clean and alphabetical
 #
 def pretty_print_sorted2(info):
     """Pretty_print: Because formatted printing can be messy and
