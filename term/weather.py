@@ -42,7 +42,11 @@
 #  Chad Homan     2021-02-08        primary header
 #
 
-DONE = "done"
+import json
+import requests
+import uszipcode
+
+DONE   = "done"
 APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 
 
@@ -51,6 +55,8 @@ APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 #
 def main():
     location = getLocation()
+    weather_info = getWeather(location)
+    display_Weather(weather_info)
 
 
 # function: getLocation()
@@ -58,25 +64,60 @@ def main():
 #
 def getLocation():
 
+    search = uszipcode.SearchEngine(simple_zipcode=True) #
+
     while True:
         location = input(f"Enter location (zip or city, state): ").strip()
 
-        if verifyLocation(location):
+        zipinfo = verifyLocation(location, search)
+        if zipinfo:
             break
 
-    print(f"location = {location}")
-    return location
+    ##print(f"location = {location}")
+    print(f"zipinfo = {zipinfo}")
+    return zipinfo
 
 
-def verifyLocation(loc):
+def getWeather(zip):
+
+    part     = "minutely"
+    units    = "imperial"
+    baseurl  = "https://api.openweathermap.org/data/2.5/onecall?"
+    url_data =  [
+       f"lat={zip.lat}",
+       f"lon={zip.lng}",
+       f"exclude={part}",
+       f"units={units}",
+       f"appid={APIKEY}",
+    ]
+    adjurl   = "&".join(url_data)
+    url      = f"{baseurl}{adjurl}"
+
+    r = requests.get(url)
+    return json.loads(r.content)
+
+
+def display_Weather(weather):
+    print(weather)
+    print(weather["current"])
+
+
+
+def verifyLocation(loc, search):
 
     if loc.isdigit() and len(loc) == 5:
-        return True
+        zipinfo = search.by_zipcode(loc)
 
     elif "," in loc:
-        pass
+        city, state = loc.split(",")
+        city  = city.strip()
+        state = state.strip()
+        zipinfo = search.by_city_and_state(city, state)[0]
 
-    return False
+    else:
+        zipinfo = None
+
+    return zipinfo
 
 
 if __name__ == "__main__":
