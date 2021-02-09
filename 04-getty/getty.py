@@ -49,6 +49,10 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-09        Added file checks to only write to
+#                                   current directory or /tmp
+#  Chad Homan     2021-02-08        Initial code to write and append to a
+#                                   user specified file.
 #  Chad Homan     2021-02-05        Still playing with the sorting, did not
 #                                   like the multiple loops from the
 #                                   pretty_print_sorted1(). After some
