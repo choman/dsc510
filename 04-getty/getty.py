@@ -1,6 +1,6 @@
 # DSC 510
-# Week 8
-# Programming Assignment Week 8
+# Week 9
+# Programming Assignment Week 9
 # Author: Chad Homan
 # 2021/01/05
 #
@@ -49,6 +49,10 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-09        Added file checks to only write to
+#                                   current directory or /tmp
+#  Chad Homan     2021-02-08        Initial code to write and append to a
+#                                   user specified file.
 #  Chad Homan     2021-02-05        Still playing with the sorting, did not
 #                                   like the multiple loops from the
 #                                   pretty_print_sorted1(). After some
@@ -64,6 +68,7 @@
 #                                   added function docstrings
 #
 
+import os
 import string
 
 PRETTY_PRINT         = 0
@@ -79,6 +84,12 @@ USE_BUFFER           = False
 def main():
     info = {}
     data = []
+    filename = None
+
+    option = greetings()
+
+    if option > 1:
+        filename = getFilename()
 
     if USE_BUFFER:
         openFile(data)
@@ -90,14 +101,72 @@ def main():
             for line in gba_file:
                 process_line(line, info)
 
-    if PRETTY_PRINT == PRETTY_PRINT_SORTED1:
-        pretty_print_sorted1(info)
+    if option == 1 or option == 3:
+        if PRETTY_PRINT == PRETTY_PRINT_SORTED1:
+            pretty_print_sorted1(info)
 
-    elif PRETTY_PRINT == PRETTY_PRINT_SORTED2:
-        pretty_print_sorted2(info)
+        elif PRETTY_PRINT == PRETTY_PRINT_SORTED2:
+            pretty_print_sorted2(info)
 
-    else:
-        pretty_print(info)
+        else:
+            pretty_print(info)
+
+    if option > 1 and filename is not None:
+        write_header(filename, info)
+        process_file(filename, info)
+
+
+def getFilename():
+    tmp   = "/tmp/"
+    error = "Invalid, please enter a filename"
+
+    while True:
+        path = input("Please enter a filename: ")
+        path = os.path.normpath(path)
+
+        if "getty.py" in path or "gettysburg.txt" in path:
+            print(error)
+            continue
+
+        if path.startswith(tmp) and len(path) > len(tmp):
+            break
+
+        if '/' in path or '\\' in path:
+            print(error)
+            continue
+
+        break
+
+    return path
+
+
+def greetings():
+    error = "Invalid option, please enter a valid option"
+    msg = """
+How would you like to see the Gettysburg info:
+
+   1) On the Screen
+   2) Output to file
+   3) Output to both
+"""
+    print(f"{msg}")
+
+    while True:
+        ans = input("Enter Selection [1-3]: ")
+
+        try:
+            ans = int(ans)
+
+            if ans < 1 or ans > 3:
+                print(error)
+                continue
+
+            break
+
+        except ValueError:
+            print(error)
+
+    return ans
 
 
 # function: openFile()
@@ -163,6 +232,22 @@ def pretty_print(info):
 
     for word in sorted(info, key=info.get, reverse=True):
         print(f"{word:<12}{info[word]:>5}")
+
+
+def write_header(fname, info):
+    with open(fname, "w") as fp:
+       fp.write(f"Length of dictionary: {len(info)}\n")
+
+
+def process_file(fname, info):
+    with open(fname, "a") as fp:
+        fp.write("Word          Count\n")
+        fp.write("-------------------\n")
+
+        for word in sorted(info, key=info.get, reverse=True):
+            fp.write(f"{word:<12}{info[word]:>5}\n")
+
+    print(f"\nOutput file: {fname}")
 
 
 # function: pretty_print_sorted1()
