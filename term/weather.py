@@ -44,9 +44,17 @@
 
 import json
 import requests
-import uszipcode
 
-DONE   = "done"
+try:
+    import uszipcode
+    USE_USZIPCODE = True
+
+except ModuleNotFoundError:
+    print(f"Proceeding w/o uszipcode module")
+    USE_USZIPCODE = False
+
+
+QUIT   = "q"
 APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 
 
@@ -54,9 +62,7 @@ APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 # abstract: Main program
 #
 def main():
-    location = getLocation()
-    weather_info = getWeather(location)
-    display_Weather(weather_info)
+    getLocation()
 
 
 # function: getLocation()
@@ -64,14 +70,20 @@ def main():
 #
 def getLocation():
 
-    search = uszipcode.SearchEngine(simple_zipcode=True) #
+    search = None
+
+    if USE_USZIPCODE:
+        search = uszipcode.SearchEngine(simple_zipcode=True) #
 
     while True:
         location = input(f"Enter location (zip or city, state): ").strip()
 
         zipinfo = verifyLocation(location, search)
+
         if zipinfo:
-            break
+            weather_info = getWeather(location)
+            display_Weather(weather_info)
+
 
     ##print(f"location = {location}")
     print(f"zipinfo = {zipinfo}")
@@ -83,13 +95,27 @@ def getWeather(zip):
     part     = "minutely"
     units    = "imperial"
     baseurl  = "https://api.openweathermap.org/data/2.5/onecall?"
-    url_data =  [
-       f"lat={zip.lat}",
-       f"lon={zip.lng}",
+    baseurl  = "https://api.openweathermap.org/data/2.5/weather?"
+    url_data = []
+
+    if USE_USZIPCODE:
+        url_data.append(f"lat={zip.lat}")
+        url_data.append(f"lon={zip.lng}")
+
+    else:
+        print(f"{zip}")
+        if "," in zip:
+            url_data.append(f"zip={zip}")
+
+        else:
+            url_data.append(f"q={zip}")
+
+    url_ext = [
        f"exclude={part}",
        f"units={units}",
        f"appid={APIKEY}",
     ]
+
     adjurl   = "&".join(url_data)
     url      = f"{baseurl}{adjurl}"
 
@@ -103,16 +129,22 @@ def display_Weather(weather):
 
 
 
-def verifyLocation(loc, search):
+def verifyLocation(loc, search=None):
 
     if loc.isdigit() and len(loc) == 5:
-        zipinfo = search.by_zipcode(loc)
+        if search is None:
+            zipinfo = loc
+        else:
+            zipinfo = search.by_zipcode(loc)
 
     elif "," in loc:
         city, state = loc.split(",")
         city  = city.strip()
         state = state.strip()
-        zipinfo = search.by_city_and_state(city, state)[0]
+
+        if search is None:
+            zipinfo = f"{city}:{state}"
+            zipinfo = search.by_city_and_state(city, state)[0]
 
     else:
         zipinfo = None
