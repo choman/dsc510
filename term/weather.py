@@ -53,9 +53,9 @@ except ModuleNotFoundError:
     print(f"Proceeding w/o uszipcode module")
     USE_USZIPCODE = False
 
-
 QUIT   = "q"
 APIKEY = "af6ca8a2c9759b2d33ec039bd9c21bbd"
+APIKEY = "b5fc619b5bbbf6aacbcdd198e5e5fab1"
 
 
 # function: main()
@@ -69,34 +69,35 @@ def main():
 # abstract: Get a location to obtain weather info
 #
 def getLocation():
-
     search = None
 
     if USE_USZIPCODE:
-        search = uszipcode.SearchEngine(simple_zipcode=True) #
+        search = uszipcode.SearchEngine(simple_zipcode=True)
 
     while True:
-        location = input(f"Enter location (zip or city, state): ").strip()
+        print()
+        location = input(f"Enter location (<zip> or <city, state>): ").strip()
 
         zipinfo = verifyLocation(location, search)
+        print(f"zipinfo = {zipinfo}")
 
         if zipinfo:
-            weather_info = getWeather(location)
+            weather_info = getWeather(zipinfo)
             display_Weather(weather_info)
 
-
     ##print(f"location = {location}")
-    print(f"zipinfo = {zipinfo}")
     return zipinfo
 
 
 def getWeather(zip):
-
     part     = "minutely"
     units    = "imperial"
     baseurl  = "https://api.openweathermap.org/data/2.5/onecall?"
     baseurl  = "https://api.openweathermap.org/data/2.5/weather?"
-    url_data = []
+    url_data = [
+       f"units={units}",
+       f"appid={APIKEY}",
+    ]
 
     if USE_USZIPCODE:
         url_data.append(f"lat={zip.lat}")
@@ -105,28 +106,50 @@ def getWeather(zip):
     else:
         print(f"{zip}")
         if "," in zip:
-            url_data.append(f"zip={zip}")
+            url_data.append(f"q={zip},us")
 
         else:
-            url_data.append(f"q={zip}")
-
-    url_ext = [
-       f"exclude={part}",
-       f"units={units}",
-       f"appid={APIKEY}",
-    ]
+            url_data.append(f"zip={zip},us")
 
     adjurl   = "&".join(url_data)
     url      = f"{baseurl}{adjurl}"
 
+    print(url)
     r = requests.get(url)
     return json.loads(r.content)
 
 
 def display_Weather(weather):
-    print(weather)
-    print(weather["current"])
+    d = chr(176) + "F"
+    trans = {
+        "temp_max": "High",
+        "temp_min": "Low",
+        "feels_like": "Feels Like",
+    }
 
+    print(weather)
+    print(weather["weather"])
+    print(weather["main"])
+    temps = weather['main']
+    print()
+    print(f"Current weather in {weather['name']}:")
+    print()
+    for k, v in temps.items():
+        tag = d
+        if k == "humidity":
+            tag = "%"
+        if k == "pressure":
+            tag = "in"
+        if k in trans:
+            print(f" {trans[k]}:        {v}{tag}")
+
+        else:
+            print(f" {k.capitalize()}:        {v}{tag}")
+
+    print()
+    print(f" Feels Like:  {temps['feels_like']}{d}")
+    print(f" High / Low:  {temps['temp_max']}{d} / {temps['temp_min']}{d}")
+    print(f" Description: {weather['weather'][0]['description']}")
 
 
 def verifyLocation(loc, search=None):
@@ -134,6 +157,7 @@ def verifyLocation(loc, search=None):
     if loc.isdigit() and len(loc) == 5:
         if search is None:
             zipinfo = loc
+
         else:
             zipinfo = search.by_zipcode(loc)
 
@@ -143,10 +167,13 @@ def verifyLocation(loc, search=None):
         state = state.strip()
 
         if search is None:
-            zipinfo = f"{city}:{state}"
+            zipinfo = f"{city},{state}"
+
+        else:
             zipinfo = search.by_city_and_state(city, state)[0]
 
     else:
+        print(f"WARNING: Please enter valid <city, state> or <zipcode>")
         zipinfo = None
 
     return zipinfo
