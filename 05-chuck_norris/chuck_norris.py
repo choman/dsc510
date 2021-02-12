@@ -32,6 +32,7 @@
 #  Chad Homan     2021-02-12        initial code
 #
 
+import json
 import requests
 import string
 
@@ -46,13 +47,15 @@ def main():
     while True:
         result = input("Would you like to here a Chuck Norris joke [Y/n]? ")
         exit_program(result)
-        get_joke()
+        joke = get_joke()
 
 # function: get_joke()
 # abstract: get a chuck norris joke
 #
 def get_joke():
-    result = request
+    result = requests.get(URL)
+    return json.load(result.json)
+
 
 # function: welcome()
 # abstract: welcome message
