@@ -117,6 +117,9 @@ def main():
         process_file(filename, info)
 
 
+# function: getFilename()
+# abstract: get the filename
+#
 def getFilename():
     tmp   = "/tmp/"
     error = "Invalid, please enter a filename"
@@ -141,6 +144,9 @@ def getFilename():
     return path
 
 
+# function: main()
+# abstract: Main program
+#
 def greetings():
     error = "Invalid option, please enter a valid option"
     msg = """
@@ -235,11 +241,17 @@ def pretty_print(info):
         print(f"{word:<12}{info[word]:>5}")
 
 
+# function: write_header()
+# abstract: Create outfile and write dictionary header
+#
 def write_header(fname, info):
     with open(fname, "w") as fp:
         fp.write(f"Length of dictionary: {len(info)}\n")
 
 
+# function: process_file()
+# abstract: append to outfile
+#
 def process_file(fname, info):
     with open(fname, "a") as fp:
         fp.write("Word          Count\n")
