@@ -30,45 +30,68 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-02-12        initial code
+#                                   added requests and joke parser
+#                                   started pretyy print
 #
 
 import json
 import requests
-import string
+import textwrap
+import sys
 
 QUIT = "n"
 URL  = "https://api.chucknorris.io/jokes/random"
+
 
 # function: main()
 # abstract: Main program
 #
 def main():
     welcome()
+
     while True:
+        print()
         result = input("Would you like to here a Chuck Norris joke [Y/n]? ")
+        print(result)
         exit_program(result)
         joke = get_joke()
+        pretty_print(joke)
+
 
 # function: get_joke()
 # abstract: get a chuck norris joke
 #
 def get_joke():
     result = requests.get(URL)
-    return json.load(result.json)
+    return json.loads(result.content)
+
+
+# function: pretty_print()
+# abstract: print joke
+#
+def pretty_print(data):
+    jokeList = textwrap.wrap(data['value'], width=70)
+    print("-" * 70)
+    [print(f"{line}") for line in jokeList]
+    print("-" * 70)
 
 
 # function: welcome()
 # abstract: welcome message
 #
 def welcome():
-    pass
+    print("Welcome to Chad's Chuck Norris joke machine!")
+    print("Follow the directions to see a joke, enter 'n' to quit")
+    print("anything else will show a joke. Blah-ha-ha")
+
 
 # function: exit_program()
 # abstract: exit program
 #
 def exit_program(result):
-    if result.lower() in QUIT:
+    if len(result) and result.lower() in QUIT:
         sys.exit()
+
 
 if __name__ == "__main__":
     try:
