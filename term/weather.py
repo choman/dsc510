@@ -41,6 +41,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-02-12        added dynamic print for weather types
 #                                   added print_debug()
+#                                   added docstrings
 #  Chad Homan     2021-02-11        added hPa to inch convert
 #                                   added degree symbol
 #                                   working on both zipcode and no zipcode
@@ -48,7 +49,6 @@
 #  Chad Homan     2021-02-08        primary header
 #
 
-import datetime
 import json
 import requests
 import sys
@@ -63,8 +63,8 @@ except ModuleNotFoundError:
     USE_USZIPCODE = False
 
 QUIT       = "q"
-APIKEY     = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 APIKEY     = "b5fc619b5bbbf6aacbcdd198e5e5fab1"
+APIKEY     = "af6ca8a2c9759b2d33ec039bd9c21bbd"
 DEGREE     = chr(176) + "F"
 HPA2INCH   = .02953
 METER2MILE = .000621371
@@ -104,14 +104,13 @@ def getLocation():
             weather_info = getWeather(zipinfo)
             display_Weather(weather_info)
 
-    ##print(f"location = {location}")
+    print_debug("location = {location}")
     return zipinfo
 
 
 def getWeather(zip):
-    part     = "minutely"
+    """Get wether info from openweather map"""
     units    = "imperial"
-    baseurl  = "https://api.openweathermap.org/data/2.5/onecall?"
     baseurl  = "https://api.openweathermap.org/data/2.5/weather?"
     url_data = [
        f"units={units}",
@@ -138,11 +137,15 @@ def getWeather(zip):
     r = requests.get(url)
     return json.loads(r.content)
 
+
 def print_debug(msg):
+    """simple debug messages"""
     if DEBUG:
         print(f"DEBUG: {msg}")
 
+
 def display_Weather(weather):
+    """driver for weather display"""
     temps = weather['main']
 
     print_calls = {
@@ -170,77 +173,108 @@ def display_Weather(weather):
     print_debug(temps)
     for k, v in temps.items():
         if k in print_calls:
-            print_calls[k](k, v) 
+            print_calls[k](k, v)
 
     print()
     print_desc(weather)
 
     for k, v in weather.items():
         if k in print_calls:
-            print_calls[k](k, v) 
+            print_calls[k](k, v)
+
 
 def print_desc(weather):
+    """Prepare and display weather description info"""
     key = format_title("Description")
     for desc in weather['weather']:
         print(f"{key:<{LJUST}}{desc['description'].capitalize()}")
 
+
 def format_title(key):
+    """Prepare description field for values"""
     key = f" {key.capitalize()}:"
     return key
 
+
 def print_humidity(key, value):
+    """Prepare and display humidity info"""
     key = format_title(key)
     print(f"{key:<{LJUST}}{value:>{RJUST}}%")
 
+
 def print_pressure(key, value):
+    """Prepare and display pressure info"""
     key = format_title(key)
     value = f"{value * HPA2INCH:.2f}in"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
+
 def print_temp(key, value):
+    """Prepare and display various temp info"""
     key = format_title(key)
     value = f"{value}{DEGREE}"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
+
 def print_feels_like(key, value):
+    """Prepare feels like temp info"""
     print_temp("Feels Like", value)
 
+
 def print_temp_max(key, value):
+    """Prepare high temp info"""
     print_temp("High", value)
 
+
 def print_temp_min(key, value):
+    """Prepare low temp info"""
     print_temp("Low", value)
 
+
 def print_visibility(key, value):
+    """Prepare and display visibility info"""
     key = format_title(key)
     value = f"{value * METER2MILE:.2f}mi"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
+
 def print_wind(key, value):
+    """Prepare and display wind info"""
     key = format_title(key)
     value = f"{value['speed']}mph {value['deg']}"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
+
 def print_clouds(key, value):
+    """Prepare and display cloud info"""
     key = format_title(key)
     value =f"{value['all']}%"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
+
 def print_snow_rain(key, value):
+    """Prepare and display snow/rain info"""
     key = format_title(key)
     for k, v in value.items():
-        print(f"{key:<{LJUST}}     {k}: {v * MM2INCH:.2f}in")
-        
+        value = f"{k}: {v * MM2INCH:.2f}in"
+        print(f"{key:<{LJUST}}{value:>{RJUST}}")
+
+
 def print_sys(key, value):
-    value['sunrise'] = time.strftime("%H:%M", time.localtime(value['sunrise']))
-    value['sunset'] = time.strftime("%H:%M", time.localtime(value['sunset']))
-    key = format_title('Sunrise')
-    print(f"{key:<{LJUST}}{value['sunrise']:>{RJUST}}")
-    key = format_title('Sunset')
-    print(f"{key:<{LJUST}}{value['sunset']:>{RJUST}}")
+    """Prepare display of the sunrise/sunset"""
+    print_riseset("Sunrise", value['sunrise'])
+    print_riseset("Sunset", value['sunset'])
+
+
+def print_riseset(title, value):
+    """Actual display of the sunrise/sunset"""
+    key = format_title(title)
+    value = time.strftime("%H:%M", time.localtime(value))
+    print(f"{key:<{LJUST}}{value:>{RJUST}}")
+
 
 def verifyLocation(loc, search=None):
-
+    """Verify the location entered by the user"""
     if loc.isdigit() and len(loc) == 5:
         if search is None:
             zipinfo = loc
