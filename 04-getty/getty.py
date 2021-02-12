@@ -49,6 +49,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-12        final lint before subnitting
 #  Chad Homan     2021-02-09        Added file checks to only write to
 #                                   current directory or /tmp
 #  Chad Homan     2021-02-08        Initial code to write and append to a
@@ -236,7 +237,7 @@ def pretty_print(info):
 
 def write_header(fname, info):
     with open(fname, "w") as fp:
-       fp.write(f"Length of dictionary: {len(info)}\n")
+        fp.write(f"Length of dictionary: {len(info)}\n")
 
 
 def process_file(fname, info):
