@@ -49,6 +49,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-12        Added headers and docstrings
 #  Chad Homan     2021-02-12        final lint before subnitting
 #  Chad Homan     2021-02-09        Added file checks to only write to
 #                                   current directory or /tmp
@@ -121,6 +122,11 @@ def main():
 # abstract: get the filename
 #
 def getFilename():
+    """Ask user for a filename
+    Parmeters: None
+    Return: filename
+    """
+
     tmp   = "/tmp/"
     error = "Invalid, please enter a filename"
 
@@ -245,6 +251,11 @@ def pretty_print(info):
 # abstract: Create outfile and write dictionary header
 #
 def write_header(fname, info):
+    """abstract: Create outfile and write dictionary header
+
+    Parameter: filename and data
+    Return Value: Nothing
+    """
     with open(fname, "w") as fp:
         fp.write(f"Length of dictionary: {len(info)}\n")
 
@@ -253,6 +264,11 @@ def write_header(fname, info):
 # abstract: append to outfile
 #
 def process_file(fname, info):
+    """append to outfile
+
+    Parameter: filename and data
+    Return Value: Nothing
+    """
     with open(fname, "a") as fp:
         fp.write("Word          Count\n")
         fp.write("-------------------\n")
@@ -271,7 +287,6 @@ def pretty_print_sorted1(info):
     often particular to each situation (meaning that we might
     need to modify it later), we separated out the printing
     function. The parameter is a dictionary.
-
 
     No return value.
     """
