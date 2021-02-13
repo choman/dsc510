@@ -39,8 +39,9 @@ import requests
 import textwrap
 import sys
 
-QUIT = "n"
-URL  = "https://api.chucknorris.io/jokes/random"
+QUIT  = "n"
+URL   = "https://api.chucknorris.io/jokes/random"
+WIDTH = 70
 
 
 # function: main()
@@ -51,7 +52,7 @@ def main():
 
     while True:
         print()
-        result = input("Would you like to here a Chuck Norris joke [Y/n]? ")
+        result = input("Would you like to hear a Chuck Norris joke [Y/n]? ")
         print(result)
         exit_program(result)
         joke = get_joke()
@@ -70,10 +71,10 @@ def get_joke():
 # abstract: print joke
 #
 def pretty_print(data):
-    jokeList = textwrap.wrap(data['value'], width=70)
-    print("-" * 70)
+    jokeList = textwrap.wrap(data['value'], width=WIDTH)
+    print("-" * WIDTH)
     [print(f"{line}") for line in jokeList]
-    print("-" * 70)
+    print("-" * WIDTH)
 
 
 # function: welcome()
