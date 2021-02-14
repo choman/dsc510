@@ -31,7 +31,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-02-12        initial code
 #                                   added requests and joke parser
-#                                   started pretyy print
+#                                   started pretty print
 #
 
 import json
@@ -63,8 +63,21 @@ def main():
 # abstract: get a chuck norris joke
 #
 def get_joke():
-    result = requests.get(URL)
-    return json.loads(result.content)
+    try:
+        result = requests.get(URL)
+        result.raise_for_status()
+        data = json.loads(result.content)
+
+    except requests.exceptions.ConnectionError as err:
+        raise SystemExit(err)
+
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    except requests.exceptions.RequestException as err:
+        raise SystemExit(err)
+
+    return data
 
 
 # function: pretty_print()
@@ -81,6 +94,7 @@ def pretty_print(data):
 # abstract: welcome message
 #
 def welcome():
+    print()
     print("Welcome to Chad's Chuck Norris joke machine!")
     print("Follow the directions to see a joke, enter 'n' to quit")
     print("anything else will show a joke. Blah-ha-ha")
