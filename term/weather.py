@@ -72,6 +72,7 @@ MM2INCH    = .0393701
 LJUST      = 15
 RJUST      = 1
 DEBUG      = False
+PARAMS     = True
 
 
 # function: main()
@@ -110,31 +111,32 @@ def getLocation():
 
 def getWeather(zip):
     """Get wether info from openweather map"""
-    units    = "imperial"
-    baseurl  = "https://api.openweathermap.org/data/2.5/weather?"
-    url_data = [
-       f"units={units}",
-       f"appid={APIKEY}",
-    ]
+    units = "imperial"
+    url   = "https://api.openweathermap.org/data/2.5/weather"
+
+    url_data = {
+        "units": f"{units}",
+        "appid": f"{APIKEY}",
+    }
 
     if USE_USZIPCODE:
-        url_data.append(f"lat={zip.lat}")
-        url_data.append(f"lon={zip.lng}")
+        url_data["lat"] = f"{zip.lat}"
+        url_data["lon"] = f"{zip.lng}"
 
     else:
         print_debug(zip)
 
         if "," in zip:
-            url_data.append(f"q={zip},us")
+            url_data["q"] = f"{zip},us"
 
         else:
-            url_data.append(f"zip={zip},us")
+            url_data["zip"] = f"{zip},us"
 
-    adjurl   = "&".join(url_data)
-    url      = f"{baseurl}{adjurl}"
 
-    print(url)
-    r = requests.get(url)
+    print_debug(f"url = {url}")
+    print_debug(f"url_data = {url_data}")
+
+    r = requests.get(url, params=url_data)
     return json.loads(r.content)
 
 
