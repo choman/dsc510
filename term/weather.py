@@ -62,17 +62,77 @@ except ModuleNotFoundError:
     print(f"Proceeding w/o uszipcode module")
     USE_USZIPCODE = False
 
-QUIT       = "q"
-APIKEY     = "b5fc619b5bbbf6aacbcdd198e5e5fab1"
-APIKEY     = "af6ca8a2c9759b2d33ec039bd9c21bbd"
-DEGREE     = chr(176) + "F"
-HPA2INCH   = .02953
-METER2MILE = .000621371
-MM2INCH    = .0393701
-LJUST      = 15
-RJUST      = 1
-DEBUG      = False
-PARAMS     = True
+QUIT        = "q"
+APIKEY      = "b5fc619b5bbbf6aacbcdd198e5e5fab1"
+APIKEY      = "af6ca8a2c9759b2d33ec039bd9c21bbd"
+DEGREE      = chr(176) + "F"
+HPA2INCH    = .02953
+METER2MILE  = .000621371
+MM2INCH     = .0393701
+LJUST       = 15
+RJUST       = 1
+DEBUG       = False
+ZIPCODE_KEY = "823b29f0-6fb2-11eb-af5d-b780351b2eba"
+
+states = {
+        'AK': 'Alaska',
+        'AL': 'Alabama',
+        'AR': 'Arkansas',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DC': 'District of Columbia',
+        'DE': 'Delaware',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'IA': 'Iowa',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'MA': 'Massachusetts',
+        'MD': 'Maryland',
+        'ME': 'Maine',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MO': 'Missouri',
+        'MP': 'Northern Mariana Islands',
+        'MS': 'Mississippi',
+        'MT': 'Montana',
+        'NA': 'National',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'NE': 'Nebraska',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NV': 'Nevada',
+        'NY': 'New York',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VA': 'Virginia',
+        'VI': 'Virgin Islands',
+        'VT': 'Vermont',
+        'WA': 'Washington',
+        'WI': 'Wisconsin',
+        'WV': 'West Virginia',
+        'WY': 'Wyoming'
+}
 
 
 # function: main()
@@ -103,7 +163,7 @@ def getLocation():
 
         if zipinfo:
             weather_info = getWeather(zipinfo)
-            display_Weather(weather_info)
+            display_Weather(weather_info, zipinfo)
 
     print_debug("location = {location}")
     return zipinfo
@@ -125,17 +185,15 @@ def getWeather(zip):
 
     else:
         print_debug(zip)
+        print(zip)
 
-        if "," in zip:
-            url_data["q"] = f"{zip},us"
-
-        else:
-            url_data["zip"] = f"{zip},us"
-
+        url_data["zip"] = f"{zip['zipcode']},us"
 
     print_debug(f"url = {url}")
     print_debug(f"url_data = {url_data}")
 
+    data = getInfo(url, params=url_data)
+    print(data)
     r = requests.get(url, params=url_data)
     return json.loads(r.content)
 
@@ -146,7 +204,7 @@ def print_debug(msg):
         print(f"DEBUG: {msg}")
 
 
-def display_Weather(weather):
+def display_Weather(weather, zipinfo):
     """driver for weather display"""
     temps = weather['main']
 
@@ -170,7 +228,11 @@ def display_Weather(weather):
     print_debug(weather["main"])
 
     print()
-    print(f"Current weather in {weather['name']}:\n")
+    wheader = (
+      f"Current weather in {zipinfo['city']}, "
+      f"{zipinfo['state']} {zipinfo['zipcode']}:\n"
+    )
+    print(wheader)
 
     print_debug(temps)
     for k, v in temps.items():
@@ -277,10 +339,27 @@ def print_riseset(title, value):
 
 def verifyLocation(loc, search=None):
     """Verify the location entered by the user"""
+    warn_msg = f"WARNING: Please enter valid <city, state> or <zipcode>"
+    headers = {
+       "apikey": ZIPCODE_KEY,
+    }
+
+
     if loc.isdigit() and len(loc) == 5:
         if search is None:
             zipinfo = loc
-
+            params = (
+                 ("codes", f"{loc}"),
+                 ("country","us"),
+            )
+            url = 'https://app.zipcodebase.com/api/v1/search'
+            zipinfo = getInfo(url, headers=headers, params=params)
+            if not len(zipinfo["results"]):
+                print(f"{warn_msg}")
+                zipinfo = None
+            else:
+                zipinfo = normalize_zipinfo(zipinfo=zipinfo)
+            
         else:
             zipinfo = search.by_zipcode(loc)
 
@@ -290,17 +369,60 @@ def verifyLocation(loc, search=None):
         state = state.strip()
 
         if search is None:
+            print("hello")
             zipinfo = f"{city},{state}"
+            params = (
+                 ("city", f"{city.capitalize()}"),
+                 ("state_name", f"{states[state.upper()]}"),
+                 ("country", "us".upper()),
+            )
+
+            url = 'https://app.zipcodebase.com/api/v1/code/city'
+            zipinfo = getInfo(url, headers=headers, params=params)
+            if not len(zipinfo["results"]):
+                print(f"{warn_msg}")
+                zipinfo = None
+            else:
+                zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
         else:
             zipinfo = search.by_city_and_state(city, state)[0]
-            print(zipinfo)
 
     else:
-        print(f"WARNING: Please enter valid <city, state> or <zipcode>")
+        print(f"{warn_msg}")
         zipinfo = None
 
     return zipinfo
+
+def normalize_zipinfo(zipinfo=None):
+    data = {}
+
+    if zipinfo is None:
+        return zipinfo
+
+
+    if "query" in zipinfo:
+        if "city" in zipinfo["query"]:
+            data["city"] = zipinfo["query"]["city"]
+            data["state"] = searchByState(zipinfo["query"]["state"])
+            data["zipcode"] = zipinfo["results"][0]
+
+        elif "codes" in zipinfo["query"]:
+            code = zipinfo["query"]["codes"][0]
+            data["city"] = zipinfo["results"][code][0]["city"]
+            data["state"] = searchByState(zipinfo["results"][code][0]["state"])
+            data["zipcode"] = zipinfo["results"][code][0]["postal_code"]
+
+    return data
+
+def searchByState(state):
+    for k, v in states.items():
+        if state in v:
+            return k.capitalize()
+
+def getInfo(url, headers=None, params=None):
+    result = requests.get(url, headers=headers, params=params)
+    return json.loads(result.content)
 
 
 if __name__ == "__main__":
