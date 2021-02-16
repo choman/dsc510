@@ -355,7 +355,7 @@ def verifyLocationByAPI(loc, search):
         state = state.strip()
 
         try:
-            zipinfo = search.by_city_and_state(city, state)[0]
+            zipinfo = random.choice(search.by_city_and_state(city, state))
         except IndexError:
             return None
 
