@@ -162,7 +162,7 @@ def getLocation():
             sys.exit()
 
         zipinfo = verifyLocation(location, search)
-        print(f"zipinfo = {zipinfo}")
+        print_debug(f"zipinfo = {zipinfo}")
 
         if zipinfo:
             weather_info = getWeather(zipinfo)
@@ -197,20 +197,19 @@ def print_debug(msg):
 def display_Weather(weather, zipinfo):
     """driver for weather display"""
     temps = weather['main']
-
     print_calls = {
-        "humidity": print_humidity,
-        "pressure": print_pressure,
-        "temp_max": print_temp_max,
-        "temp_min": print_temp_min,
+        "humidity":   print_humidity,
+        "pressure":   print_pressure,
+        "temp_max":   print_temp_max,
+        "temp_min":   print_temp_min,
         "feels_like": print_feels_like,
-        "temp": print_temp,
+        "temp":       print_temp,
         "visibility": print_visibility,
-        "wind": print_wind,
-        "clouds": print_clouds,
-        "sys": print_sys,
-        "snow": print_snow_rain,
-        "rain": print_snow_rain,
+        "wind":       print_wind,
+        "clouds":     print_clouds,
+        "sys":        print_sys,
+        "snow":       print_snow_rain,
+        "rain":       print_snow_rain,
     }
 
     print_debug(weather)
