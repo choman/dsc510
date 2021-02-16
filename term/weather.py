@@ -50,6 +50,7 @@
 #
 
 import json
+import random
 import requests
 import sys
 import time
@@ -423,13 +424,14 @@ def normalize_zipinfo(zipinfo=None):
         if "city" in zipinfo["query"]:
             data["city"] = zipinfo["query"]["city"]
             data["state"] = searchByState(zipinfo["query"]["state"])
-            data["zipcode"] = zipinfo["results"][0]
+            data["zipcode"] = random.choice(zipinfo["results"])
 
         elif "codes" in zipinfo["query"]:
             code = zipinfo["query"]["codes"][0]
             data["city"] = zipinfo["results"][code][0]["city"]
             data["state"] = searchByState(zipinfo["results"][code][0]["state"])
             data["zipcode"] = zipinfo["results"][code][0]["postal_code"]
+
         else:
             data = None
     else:
