@@ -396,7 +396,7 @@ def verifyLocationByURL(loc):
         zipinfo = f"{city},{state}"
         params = (
             ("city", f"{city.capitalize()}"),
-            ("state_name", f"{states[state.upper()]}"),
+            ("state_name", f"{states.get(state.upper(), None)}"),
             ("country", "us".upper()),
         )
 
