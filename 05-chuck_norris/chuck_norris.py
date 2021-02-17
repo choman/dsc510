@@ -29,6 +29,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-14        added textwrap and macro WIDTH
+#  Chad Homan     2021-02-13        added requests.exceptions
 #  Chad Homan     2021-02-12        initial code
 #                                   added requests and joke parser
 #                                   started pretty print
@@ -51,18 +53,27 @@ def main():
     welcome()
 
     while True:
-        print()
-        result = input("Would you like to hear a Chuck Norris joke [Y/n]? ")
-        print(result)
+        result = wantJoke()
         exit_program(result)
         joke = get_joke()
         pretty_print(joke)
+
+
+# function: wantJoke()
+# abstract: asks user if they want to hear a joke
+#
+def wantJoke():
+    """ask user for joke"""
+    print()
+    result = input("Would you like to hear a Chuck Norris joke [Y/n]? ")
+    return result
 
 
 # function: get_joke()
 # abstract: get a chuck norris joke
 #
 def get_joke():
+    """query URL for random CN joke"""
     try:
         result = requests.get(URL)
         result.raise_for_status()
@@ -85,6 +96,7 @@ def get_joke():
 #
 def pretty_print(data):
     jokeList = textwrap.wrap(data['value'], width=WIDTH)
+    print()
     print("-" * WIDTH)
     [print(f"{line}") for line in jokeList]
     print("-" * WIDTH)
