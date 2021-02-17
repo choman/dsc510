@@ -96,6 +96,7 @@ def get_joke():
 #
 def pretty_print(data):
     jokeList = textwrap.wrap(data['value'], width=WIDTH)
+    print()
     print("-" * WIDTH)
     [print(f"{line}") for line in jokeList]
     print("-" * WIDTH)
