@@ -39,6 +39,7 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-17        added welcome() message
 #  Chad Homan     2021-02-12        added dynamic print for weather types
 #                                   added print_debug()
 #                                   added docstrings
@@ -143,7 +144,15 @@ states = {
 # abstract: Main program
 #
 def main():
+    welcome()
     getLocation()
+
+
+def welcome():
+    print() 
+    print("Welcome for Chad's Weather Machine")
+    print("Follow the directions, press <enter>")
+    print("on a line by itself to leave")
 
 
 # function: getLocation()
