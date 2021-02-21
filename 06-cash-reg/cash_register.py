@@ -32,7 +32,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-02-21        privatized count and total
 #                                   added 'getter' via a property
-#                                   added locale
+#                                   added locale and testPrice
 #  Chad Homan     2021-02-17        initial code
 #
 
@@ -42,21 +42,58 @@ import locale
 class CashRegister():
 
     def __init__(self):
+        """__init__
+
+        :param: Nothing
+        :return: Nothing
+        """
         locale.setlocale(locale.LC_ALL, '')
         self.__count = 0
         self.__total = 0
 
     def addItem(self, price):
+        """addItem
+
+        :param price: cost os item
+        :return: nothing
+        """
         self.__count += 1
-        self.__total += price
+        self.__total += round(price, 2)
 
     @property
     def getCount(self):
+        """getCount
+
+        :param: nothing
+        :return: total count
+        """
         return self.__count
 
     @property
     def getTotal(self):
+        """getTotal
+
+        :param: Nothing
+        :return: total price
+        """
         return locale.currency(self.__total, symbol=True)
+
+
+# function: testPrice()
+# abstract: verify the numbers entered are float's
+#
+def testPrice(price):
+    """testPrice
+
+    :param price: item to test
+    :return: Boolean: True if float or int, False if not
+    """
+    try:
+        float(price)
+        return True
+
+    except ValueError:
+        return False
 
 
 # function: main()
@@ -74,7 +111,13 @@ def main():
         if not len(price):
             break
 
-        cart.addItem(float(price))
+        if price.startswith("$"):
+            price = price.lstrip("$")
+
+        if testPrice(price):
+            cart.addItem(float(price))
+        else:
+            print("WARNING: Please enter a valid price or enter to checkout")
 
     print()
     print(f"Items in your cart: {cart.getCount}")
@@ -87,6 +130,7 @@ def main():
 def welcome():
     print()
     print("Welcome to Chad's Mini-Mart")
+    print()
 
 
 if __name__ == "__main__":
