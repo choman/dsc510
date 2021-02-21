@@ -30,6 +30,9 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-21        privatized count and total
+#                                   added 'getter' via a property
+#                                   added locale
 #  Chad Homan     2021-02-17        initial code
 #
 
@@ -39,7 +42,21 @@ import locale
 class CashRegister():
 
     def __init__(self):
-        pass
+        locale.setlocale(locale.LC_ALL, '')
+        self.__count = 0
+        self.__total = 0
+
+    def addItem(self, price):
+        self.__count += 1
+        self.__total += price
+
+    @property
+    def getCount(self):
+        return self.__count
+
+    @property
+    def getTotal(self):
+        return locale.currency(self.__total, symbol=True)
 
 
 # function: main()
@@ -47,7 +64,21 @@ class CashRegister():
 #
 def main():
     welcome()
-    pass
+
+    cart = CashRegister()
+
+    while True:
+        price = input("Enter price to add another item: ")
+        price = price.strip()
+
+        if not len(price):
+            break
+
+        cart.addItem(float(price))
+
+    print()
+    print(f"Items in your cart: {cart.getCount}")
+    print(f"Total price:        {cart.getTotal}")
 
 
 # function: welcome()()
