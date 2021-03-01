@@ -142,10 +142,11 @@ states = {
         'WY': 'Wyoming'
 }
 
-dirs = ['N', 'NNE', 'NE', 'ENE',
-        'E', 'ESE', 'SE', 'SSE',
-        'S', 'SSW', 'SW', 'WSW',
-        'W', 'WNW', 'NW', 'NNW']
+wind_dirs = ['N', 'NNE', 'NE', 'ENE',
+             'E', 'ESE', 'SE', 'SSE',
+             'S', 'SSW', 'SW', 'WSW',
+             'W', 'WNW', 'NW', 'NNW'
+]
 
 
 # function: main()
@@ -390,8 +391,8 @@ def verifyLocationByAPI(loc, search):
 
 
 def getWindDirection(degree):
-    ix = round(degree / (360 / len(dirs)))
-    return dirs[ix % len(dirs)]
+    ix = round(degree / (360 / len(wind_dirs)))
+    return wind_dirs[ix % len(wind_dirs)]
 
 
 def verifyLocationByURL(loc):
