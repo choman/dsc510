@@ -30,6 +30,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-26        pre-summit flake8 and testing
+#                                   updated welcome message
 #  Chad Homan     2021-02-21        privatized count and total
 #                                   added 'getter' via a property
 #                                   added locale and testPrice
@@ -130,6 +132,12 @@ def main():
 def welcome():
     print()
     print("Welcome to Chad's Mini-Mart")
+    print()
+    print('All items are unkmown and have random prices,')
+    print('please enter the obscure price og your item')
+    print('and our cash register will do all the work.')
+    print()
+    print('When finished, hit <enter> all by itself.')
     print()
 
 
