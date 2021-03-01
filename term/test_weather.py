@@ -30,6 +30,16 @@ class TestWindDirection(unittest.TestCase):
         self.assertEqual(weather.getWindDirection(292.5), "WNW")
         self.assertEqual(weather.getWindDirection(337.5), "NNW")
 
+    def test_format_single_word_title(self):
+        test_string = "wind"
+        expected_string = f" {test_string.title()}:"
+        self.assertEqual(weather.format_title(test_string), expected_string)
+
+    def test_format_multi_word_title(self):
+        test_string = "wind direction"
+        expected_string = f" {test_string.title()}:"
+        self.assertEqual(weather.format_title(test_string), expected_string)
+
 
 if __name__ == "__main__":
     unittest.main()
