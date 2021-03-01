@@ -39,6 +39,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-02-28        Added cardinal wind direction
+#
 #  Chad Homan     2021-02-17        added welcome() message
 #  Chad Homan     2021-02-12        added dynamic print for weather types
 #                                   added print_debug()
@@ -65,7 +67,8 @@ except ModuleNotFoundError:
     USE_USZIPCODE = False
 
 QUIT         = "q"
-DEGREE       = chr(176) + "F"
+DEGREE_F     = chr(176) + "F"
+DEGREE       = chr(176)
 HPA2INCH     = .02953
 METER2MILE   = .000621371
 MM2INCH      = .0393701
@@ -139,6 +142,11 @@ states = {
         'WY': 'Wyoming'
 }
 
+dirs = ['N', 'NNE', 'NE', 'ENE',
+        'E', 'ESE', 'SE', 'SSE',
+        'S', 'SSW', 'SW', 'WSW',
+        'W', 'WNW', 'NW', 'NNW']
+
 
 # function: main()
 # abstract: Main program
@@ -149,7 +157,7 @@ def main():
 
 
 def welcome():
-    print() 
+    print()
     print("Welcome for Chad's Weather Machine")
     print("Follow the directions, press <enter>")
     print("on a line by itself to leave")
@@ -275,7 +283,7 @@ def print_pressure(key, value):
 def print_temp(key, value):
     """Prepare and display various temp info"""
     key = format_title(key)
-    value = f"{value}{DEGREE}"
+    value = f"{value}{DEGREE_F}"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
 
@@ -304,7 +312,9 @@ def print_visibility(key, value):
 def print_wind(key, value):
     """Prepare and display wind info"""
     key = format_title(key)
-    value = f"{value['speed']}mph {value['deg']}"
+    direction = getWindDirection(value['deg'])
+    direction = f"Direction: {direction}"
+    value = f"{value['speed']}mph {direction} - {value['deg']}{DEGREE}"
     print(f"{key:<{LJUST}}{value:>{RJUST}}")
 
 
@@ -377,6 +387,11 @@ def verifyLocationByAPI(loc, search):
         zipinfo = None
 
     return zipinfo
+
+
+def getWindDirection(degree):
+    ix = round(degree / (360 / len(dirs)))
+    return dirs[ix % len(dirs)]
 
 
 def verifyLocationByURL(loc):
