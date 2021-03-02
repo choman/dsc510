@@ -44,6 +44,7 @@
 #  Chad Homan     2021-03-02        Implemented a template for docstrings
 #                                   Corrected hPa math to X in water
 #                                   added logic for metric and standard
+#                                   added wind arrow - unicode
 #  Chad Homan     2021-02-28        Added cardinal wind direction
 #                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
@@ -57,6 +58,7 @@
 #  Chad Homan     2021-02-08        primary header
 #
 
+import datetime
 import json
 import random
 import requests
@@ -71,6 +73,7 @@ except ModuleNotFoundError:
     print('Proceeding w/o uszipcode module')
     USE_USZIPCODE = False
 
+USE_ARROWS   = True
 QUIT         = 'q'
 DEGREE_C     = chr(176) + 'C'
 DEGREE_F     = chr(176) + 'F'
@@ -88,10 +91,9 @@ ZIPCODE_CODE = 'https://app.zipcodebase.com/api/v1/search'
 ZIPCODE_CITY = 'https://app.zipcodebase.com/api/v1/code/city'
 ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 
-IMPERIAL     = 'imperial' # fahrenhite
-METRIC       = 'metric'   # celcius
-STANDARD     = 'standard' # kelvin
-UNITS        = IMPERIAL
+IMPERIAL     = 'imperial'  # fahrenhite
+METRIC       = 'metric'    # celcius
+STANDARD     = 'standard'  # kelvin
 
 DEGREES = {
    IMPERIAL: chr(176) + 'F',
@@ -159,12 +161,20 @@ STATES = {
     'WY': 'Wyoming'
 }
 
-wind_dirs = [
+WIND_DIRS = [
     'N', 'NNE', 'NE', 'ENE',
     'E', 'ESE', 'SE', 'SSE',
     'S', 'SSW', 'SW', 'WSW',
     'W', 'WNW', 'NW', 'NNW'
 ]
+
+if USE_ARROWS:
+    WIND_ARROWS = [
+        '\u2193', '\u2199', '\u2199', '\u2199',
+        '\u2190', '\u2196', '\u2196', '\u2196',
+        '\u2191', '\u2197', '\u2197', '\u2197',
+        '\u2192', '\u2198', '\u2198', '\u2198'
+    ]
 
 
 # function: main()
@@ -180,6 +190,10 @@ def welcome():
     print("Welcome for Chad's Weather Machine")
     print()
     print('Follow the directions')
+    print('   - All output is in imperial format')
+    print('   - if Celcius is chosen, output is in metric')
+    print('   - if Kelvin is chosen, temps only are in Kelvin')
+    print()
     print('To exit, press <enter> on a line by itself to leave')
 
 
@@ -222,7 +236,7 @@ def requestWeatherLocation():
     location = input('Enter location (<zip> or <city, state>): ').strip()
 
     if location.lower() in QUIT:
-       sys.exit()
+        sys.exit()
 
     return location
 
@@ -231,7 +245,7 @@ def requestWeatherType():
     """get weather type (imperial, metric, kelvin/standard)
 
     Returns:
-        UNITS (string): weather type
+        units (string): weather type
     """
     print()
     print('How would you like to view the weather?')
@@ -249,7 +263,7 @@ def requestWeatherType():
     return units
 
 
-def getWeather(zip, units=UNITS):
+def getWeather(zip, units=IMPERIAL):
     """Get wether info from openweather map
 
     Args:
@@ -284,7 +298,7 @@ def print_debug(msg):
         print(f'DEBUG: {msg}')
 
 
-def display_Weather(weather, zipinfo, units=UNITS):
+def display_Weather(weather, zipinfo, units=IMPERIAL):
     """driver for weather display
 
     Args:
@@ -294,7 +308,8 @@ def display_Weather(weather, zipinfo, units=UNITS):
     Returns:
         Nothing
     """
-    print (weather)
+    # XXX
+##    print(weather)
     temps = weather['main']
     print_calls = {
         'humidity':   print_humidity,
@@ -338,9 +353,9 @@ def display_Weather(weather, zipinfo, units=UNITS):
     for k, v in weather.items():
         if k in print_calls:
             if 'sys' in k:
-               print_calls[k](k, v, units, tz)
+                print_calls[k](k, v, units, tz)
             else:
-               print_calls[k](k, v, units)
+                print_calls[k](k, v, units)
 
 
 def print_desc(weather):
@@ -371,7 +386,7 @@ def format_title(key):
     return key
 
 
-def print_humidity(key, value, units=UNITS):
+def print_humidity(key, value, units=IMPERIAL):
     """Prepare and display humidity info
 
     Args:
@@ -385,7 +400,7 @@ def print_humidity(key, value, units=UNITS):
     print(f'{key:<{LJUST}}{value:>{RJUST}}%')
 
 
-def print_sea_level(key, value, units=UNITS):
+def print_sea_level(key, value, units=IMPERIAL):
     """Prepare and display pressure info
 
     Args:
@@ -395,10 +410,10 @@ def print_sea_level(key, value, units=UNITS):
     Returns:
         Nothing
     """
-    print_pressure("Sea Level", value, units=UNITS)
+    print_pressure("Sea Level", value, units=IMPERIAL)
 
 
-def print_grnd_level(key, value, units=UNITS):
+def print_grnd_level(key, value, units=IMPERIAL):
     """Prepare and display pressure info
 
     Args:
@@ -408,10 +423,10 @@ def print_grnd_level(key, value, units=UNITS):
     Returns:
         Nothing
     """
-    print_pressure("Ground Level", value, units=UNITS)
+    print_pressure("Ground Level", value, units=IMPERIAL)
 
 
-def print_pressure(key, value, units=UNITS):
+def print_pressure(key, value, units=IMPERIAL):
     """Prepare and display pressure info
 
     Args:
@@ -432,7 +447,7 @@ def print_pressure(key, value, units=UNITS):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_temp(key, value, units=UNITS):
+def print_temp(key, value, units=IMPERIAL):
     """Prepare and display various temp info
 
     Args:
@@ -447,7 +462,7 @@ def print_temp(key, value, units=UNITS):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_feels_like(key, value, units=UNITS):
+def print_feels_like(key, value, units=IMPERIAL):
     """Prepare feels like temp info
 
     Args:
@@ -460,7 +475,7 @@ def print_feels_like(key, value, units=UNITS):
     print_temp('Feels Like', value, units)
 
 
-def print_temp_max(key, value, units=UNITS):
+def print_temp_max(key, value, units=IMPERIAL):
     """Prepare high temp info
 
     Args:
@@ -473,7 +488,7 @@ def print_temp_max(key, value, units=UNITS):
     print_temp('High', value, units)
 
 
-def print_temp_min(key, value, units=UNITS):
+def print_temp_min(key, value, units=IMPERIAL):
     """Prepare low temp info
 
     Args:
@@ -486,7 +501,7 @@ def print_temp_min(key, value, units=UNITS):
     print_temp('Low', value, units)
 
 
-def print_visibility(key, value, units=UNITS):
+def print_visibility(key, value, units=IMPERIAL):
     """Prepare and display visibility info
 
     Args:
@@ -507,7 +522,7 @@ def print_visibility(key, value, units=UNITS):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_wind(key, value, units=UNITS):
+def print_wind(key, value, units=IMPERIAL):
     """Prepare and display wind info
 
     Args:
@@ -530,12 +545,12 @@ def print_wind(key, value, units=UNITS):
             else:
                 tag = "mph"
 
-            svalue = f"{value['speed']}{tag}"
+            svalue = f"{value[k]}{tag}"
 
         print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
 
-def print_clouds(key, value, units=UNITS):
+def print_clouds(key, value, units=IMPERIAL):
     """Prepare and display cloud info
 
     Args:
@@ -550,7 +565,7 @@ def print_clouds(key, value, units=UNITS):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_snow_rain(key, value, units=UNITS):
+def print_snow_rain(key, value, units=IMPERIAL):
     """Prepare and display snow/rain info
 
     Args:
@@ -566,14 +581,14 @@ def print_snow_rain(key, value, units=UNITS):
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_sys(key, value, tz=None, units=UNITS):
+def print_sys(key, value, units=IMPERIAL, tz=None):
     """Driver/Prepare display of the sunrise/sunset
 
     Args:
         key (string): description of data
         value (datetime): date/time
 
-    Returns:
+    Returns:j
         Nothing
     """
     print_riseset('Sunrise', value['sunrise'], tz)
@@ -591,10 +606,12 @@ def print_riseset(title, value, tz):
         Nothing
     """
     key = format_title(title)
-    gvalue = time.strftime('%H:%M', time.gmtime(value))
-    lvalue = time.strftime('%H:%M', time.localtime(value))
-    #lvalue = time.strftime('%H:%M', time.gmtime(value + int(tz)))
-    print(f'{key:<{LJUST}}{lvalue}CST ({gvalue:>{RJUST}}UTC)')
+    date = datetime.datetime.fromtimestamp(value)
+
+    gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
+    lvalue = time.strftime('%H:%M %Z', time.localtime(value))
+
+    print(f'{key:<{LJUST}}{lvalue} ({gvalue:>{RJUST}})')
 
 
 def verifyLocation(loc, search=None):
@@ -669,8 +686,15 @@ def getWindDirection(degree):
     Returns:
         string: cardinal direction
     """
-    ix = round(degree / (360 / len(wind_dirs)))
-    return wind_dirs[ix % len(wind_dirs)]
+    ix = round(degree / (360 / len(WIND_DIRS)))
+    idx = ix % len(WIND_DIRS)
+
+    if USE_ARROWS:
+        result = f"{WIND_DIRS[idx]} {WIND_ARROWS[idx]}"
+    else:
+        result = f"{WIND_DIRS[idx]}"
+
+    return result
 
 
 def verifyLocationByURL(loc):
@@ -742,24 +766,18 @@ def normalize_zipinfo(zipinfo=None):
         data['city'] = zipinfo.major_city
         data['state'] = zipinfo.state
         data['zipcode'] = zipinfo.zipcode
-        data['long'] = ""
-        data['lat'] = ""
 
     elif 'query' in zipinfo:
         if 'city' in zipinfo['query']:
             data['city'] = zipinfo['query']['city']
             data['state'] = searchByState(zipinfo['query']['state'])
             data['zipcode'] = random.choice(zipinfo['results'])
-            data['long'] = ""
-            data['lat'] = ""
 
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
             data['city'] = zipinfo['results'][code][0]['city']
             data['state'] = searchByState(zipinfo['results'][code][0]['state'])
             data['zipcode'] = zipinfo['results'][code][0]['postal_code']
-            data['long'] = ""
-            data['lat'] = ""
 
         else:
             data = None
