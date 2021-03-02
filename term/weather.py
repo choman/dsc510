@@ -75,8 +75,6 @@ except ModuleNotFoundError:
 
 USE_ARROWS   = True
 QUIT         = 'q'
-DEGREE_C     = chr(176) + 'C'
-DEGREE_F     = chr(176) + 'F'
 DEGREE       = chr(176)
 HPA2INCH     = .401463
 HPA2CM       = 1.01972
@@ -191,7 +189,7 @@ def welcome():
     print()
     print('Follow the directions')
     print('   - All output is in imperial format')
-    print('   - if Celcius is chosen, output is in metric')
+    print('   - if Celsius is chosen, output is in metric')
     print('   - if Kelvin is chosen, temps only are in Kelvin')
     print()
     print('To exit, press <enter> on a line by itself to leave')
