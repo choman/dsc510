@@ -43,7 +43,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-03-02        Implemented a template for docstrings
 #  Chad Homan     2021-02-28        Added cardinal wind direction
-#                                   assistance from:
+#                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
 #  Chad Homan     2021-02-12        added dynamic print for weather types
 #                                   added print_debug()
