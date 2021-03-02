@@ -59,7 +59,6 @@
 #  Chad Homan     2021-02-08        primary header
 #
 
-import datetime
 import json
 import random
 import requests
@@ -326,34 +325,33 @@ def display_Weather(weather, zipinfo, units=IMPERIAL):
         'rain':       print_snow_rain,
     }
 
-    print_debug(weather)
-    print_debug(weather['weather'])
-    print_debug(weather['main'])
-
-    print()
     wheader = (
       f"Current weather in {zipinfo['city']}, "
       f"{zipinfo['state']} {zipinfo['zipcode']} "
       f"({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
     )
-    print(wheader)
 
-    print_debug(temps)
-    for k, v in temps.items():
-        if k in print_calls:
-            print_calls[k](k, v, units)
+    def process_items(data):
+        """Internal function to process weather data
+
+        Args: data (dict): weather data
+        Returns: nothing
+        """
+        print_debug(data)
+        for k, v in data.items():
+            if k in print_calls:
+                print_calls[k](k, v, units)
+
+    print_debug(weather)
+    print_debug(weather['weather'])
+    print_debug(weather['main'])
 
     print()
+    print(wheader)
+    process_items(temps)
+    print()
     print_desc(weather)
-
-    tz = weather['timezone']
-
-    for k, v in weather.items():
-        if k in print_calls:
-            if 'sys' in k:
-                print_calls[k](k, v, units, tz)
-            else:
-                print_calls[k](k, v, units)
+    process_items(weather)
 
 
 def print_desc(weather):
@@ -583,7 +581,7 @@ def print_snow_rain(key, value, units=IMPERIAL):
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_sys(key, value, units=IMPERIAL, tz=None):
+def print_sys(key, value, units=IMPERIAL):
     """Driver/Prepare display of the sunrise/sunset
 
     Args:
@@ -593,11 +591,11 @@ def print_sys(key, value, units=IMPERIAL, tz=None):
     Returns:j
         Nothing
     """
-    print_riseset('Sunrise', value['sunrise'], tz)
-    print_riseset('Sunset', value['sunset'], tz)
+    print_riseset('Sunrise', value['sunrise'])
+    print_riseset('Sunset', value['sunset'])
 
 
-def print_riseset(title, value, tz):
+def print_riseset(title, value):
     """Actual display of the sunrise/sunset
 
     Args:
