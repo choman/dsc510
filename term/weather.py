@@ -320,7 +320,8 @@ def display_Weather(weather, zipinfo, units=UNITS):
     print()
     wheader = (
       f"Current weather in {zipinfo['city']}, "
-      f"{zipinfo['state']} {zipinfo['zipcode']}:\n"
+      f"{zipinfo['state']} {zipinfo['zipcode']} "
+      f" ({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
     )
     print(wheader)
 
