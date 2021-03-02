@@ -41,8 +41,9 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-03-02        Implemented a template for docstrings
 #  Chad Homan     2021-02-28        Added cardinal wind direction
-#
+#                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
 #  Chad Homan     2021-02-12        added dynamic print for weather types
 #                                   added print_debug()
@@ -84,7 +85,7 @@ ZIPCODE_CODE = 'https://app.zipcodebase.com/api/v1/search'
 ZIPCODE_CITY = 'https://app.zipcodebase.com/api/v1/code/city'
 ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 
-states = {
+STATES = {
         'AK': 'Alaska',
         'AL': 'Alabama',
         'AR': 'Arkansas',
@@ -163,20 +164,27 @@ def main():
 def welcome():
     print()
     print("Welcome for Chad's Weather Machine")
-    print('Follow the directions, press <enter>')
-    print('on a line by itself to leave')
+    print()
+    print('Follow the directions')
+    print('To exit, press <enter> on a line by itself to leave')
 
 
 # function: getLocation()
 # abstract: Get a location to obtain weather info
 #
 def getLocation():
+    """Loop that queries user for location of weather info
+
+    Returns:
+        Nothing
+    """
     search = None
 
     if USE_USZIPCODE:
         search = uszipcode.SearchEngine(simple_zipcode=True)
 
     while True:
+        print()
         print()
         location = input('Enter location (<zip> or <city, state>): ').strip()
 
@@ -191,12 +199,17 @@ def getLocation():
             display_Weather(weather_info, zipinfo)
 
     print_debug(f'location = {location}')
-    return zipinfo
 
 
 def getWeather(zip):
-    """Get wether info from openweather map"""
+    """Get wether info from openweather map
 
+    Args:
+        zip (int): zipdata
+
+    Returns:
+        data (dict): weather data
+    """
     url_data = {
         'units': UNITS,
         'appid': WEATHER_KEY,
@@ -211,13 +224,28 @@ def getWeather(zip):
 
 
 def print_debug(msg):
-    """simple debug messages"""
+    """simple debug messages
+
+    Args:
+        msg (data): info to print debug
+
+    Returns:
+        Nothing
+    """
     if DEBUG:
         print(f'DEBUG: {msg}')
 
 
 def display_Weather(weather, zipinfo):
-    """driver for weather display"""
+    """driver for weather display
+
+    Args:
+        weather (dict): weather data
+        zipinfo (dict): location data
+
+    Returns:
+        Nothing
+    """
     temps = weather['main']
     print_calls = {
         'humidity':   print_humidity,
@@ -259,66 +287,143 @@ def display_Weather(weather, zipinfo):
 
 
 def print_desc(weather):
-    """Prepare and display weather description info"""
+    """Prepare and display weather description info
+
+    Args:
+        weather (list): weather secriptions
+
+    Returns:
+         nothing
+    """
     key = format_title('Description')
     for desc in weather['weather']:
         print(f"{key:<{LJUST}}{desc['description'].capitalize()}")
 
 
 def format_title(key):
-    """Prepare description field for values"""
+    """Prepare description field for values
+
+    Args:
+        key (string): description of data
+
+    Returns:
+        key (string): formated
+    """
     key = f' {key.title()}:'
     return key
 
 
 def print_humidity(key, value):
-    """Prepare and display humidity info"""
+    """Prepare and display humidity info
+
+    Args:
+        key (string): description of data
+        value (float): percentage of humidity
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     print(f'{key:<{LJUST}}{value:>{RJUST}}%')
 
 
 def print_pressure(key, value):
-    """Prepare and display pressure info"""
+    """Prepare and display pressure info
+
+    Args:
+        key (string): description of data
+        value (float): pressure data in HPA
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     value = f'{value * HPA2INCH:.2f}in'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
 def print_temp(key, value):
-    """Prepare and display various temp info"""
+    """Prepare and display various temp info
+
+    Args:
+        key (string): description of data
+        value (float): temp
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     value = f'{value}{DEGREE_F}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
 def print_feels_like(key, value):
-    """Prepare feels like temp info"""
+    """Prepare feels like temp info
+
+    Args:
+        key (string): description of data
+        value (float): feels like temp
+
+    Returns:
+        Nothing
+    """
     print_temp('Feels Like', value)
 
 
 def print_temp_max(key, value):
-    """Prepare high temp info"""
+    """Prepare high temp info
+
+    Args:
+        key (string): description of data
+        value (float): high temp
+
+    Returns:
+        Nothing
+    """
     print_temp('High', value)
 
 
 def print_temp_min(key, value):
-    """Prepare low temp info"""
+    """Prepare low temp info
+
+    Args:
+        key (string): description of data
+        value (float): low temp
+
+    Returns:
+        Nothing
+    """
     print_temp('Low', value)
 
 
 def print_visibility(key, value):
-    """Prepare and display visibility info"""
+    """Prepare and display visibility info
+
+    Args:
+        key (string): description of data
+        value (float): visibility in meters
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     value = f'{value * METER2MILE:.2f}mi'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
 def print_wind(key, value):
-    """Prepare and display wind info"""
+    """Prepare and display wind info
+
+    Args:
+        key (string): description of data
+        value (dict): wind speed and direction
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     cardinal_direction = getWindDirection(value['deg'])
 
-    direction = f'Direction: {cardinal_direction}'
     svalue = f"{value['speed']}mph"
     print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
@@ -328,14 +433,30 @@ def print_wind(key, value):
 
 
 def print_clouds(key, value):
-    """Prepare and display cloud info"""
+    """Prepare and display cloud info
+
+    Args:
+        key (string): description of data
+        value (int): percentage of cloud coverage
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     value = f"{value['all']}%"
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
 def print_snow_rain(key, value):
-    """Prepare and display snow/rain info"""
+    """Prepare and display snow/rain info
+
+    Args:
+        key (string): description of data
+        value (list): how much snow/rain 1h and 3h
+
+    Returns:
+        Nothing
+    """
     key = format_title(key)
     for k, v in value.items():
         value = f'{k}: {v * MM2INCH:.2f}in'
@@ -343,20 +464,44 @@ def print_snow_rain(key, value):
 
 
 def print_sys(key, value):
-    """Prepare display of the sunrise/sunset"""
+    """Driver/Prepare display of the sunrise/sunset
+
+    Args:
+        key (string): description of data
+        value (datetime): date/time
+
+    Returns:
+        Nothing
+    """
     print_riseset('Sunrise', value['sunrise'])
     print_riseset('Sunset', value['sunset'])
 
 
 def print_riseset(title, value):
-    """Actual display of the sunrise/sunset"""
+    """Actual display of the sunrise/sunset
+
+    Args:
+        title (string): description of data
+        value (datetime): date/time
+
+    Returns:
+        Nothing
+    """
     key = format_title(title)
     value = time.strftime('%H:%M', time.localtime(value))
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
 def verifyLocation(loc, search=None):
-    """Verify the location entered by the user"""
+    """Initial driver to verify the location entered by the user
+
+    Args:
+        loc (string|int): city/sate || zip
+        search (object): option seach data base on uszipcode
+
+    Returns:
+        zipinfo (dict): zip data
+    """
     warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
 
     if search is None:
@@ -371,6 +516,15 @@ def verifyLocation(loc, search=None):
 
 
 def verifyLocationByAPI(loc, search):
+    """ Verify location based on API (uszipcode)
+
+    Args:
+       loc (string|int): City/State|zip
+       search (dict): zipcode hash/object
+
+    Returns:
+        zipinfo (dict): location data
+    """
     if loc.isdigit() and len(loc) == 5:
         zipinfo = search.by_zipcode(loc)
 
@@ -402,11 +556,27 @@ def verifyLocationByAPI(loc, search):
 
 
 def getWindDirection(degree):
+    """determine wind direction based on degree/radian
+
+    Args:
+        degree (int): randian of window direction
+
+    Returns:
+        string: cardinal direction
+    """
     ix = round(degree / (360 / len(wind_dirs)))
     return wind_dirs[ix % len(wind_dirs)]
 
 
 def verifyLocationByURL(loc):
+    """ Verify location based on URL call
+
+    Args:
+        loc (string|int): City/State || zipcode
+
+    Returns:
+        zipinfo (dict): location data
+    """
     headers = {
         'apikey': ZIPCODE_KEY,
     }
@@ -433,8 +603,8 @@ def verifyLocationByURL(loc):
 
         zipinfo = f'{city},{state}'
         params = (
-            ('city', f'{city.capitalize()}'),
-            ('state_name', f'{states.get(state.upper(), None)}'),
+            ('city', f'{city.title()}'),
+            ('state_name', f'{STATES.get(state.upper(), None)}'),
             ('country', 'us'.upper()),
         )
 
@@ -448,6 +618,16 @@ def verifyLocationByURL(loc):
 
 
 def normalize_zipinfo(zipinfo=None):
+    """ Normalize the zip info since pulling from differwent sources
+    could easily be modified to return long/lat too
+
+    Args:
+        zipinfo (dict): zipinfo
+        zipinfo (object): zipinfo
+
+    Returns:
+        data (dict): zipinfo
+    """
     data = {}
 
     if zipinfo is None:
@@ -457,18 +637,24 @@ def normalize_zipinfo(zipinfo=None):
         data['city'] = zipinfo.major_city
         data['state'] = zipinfo.state
         data['zipcode'] = zipinfo.zipcode
+        data['long'] = ""
+        data['lat'] = ""
 
     elif 'query' in zipinfo:
         if 'city' in zipinfo['query']:
             data['city'] = zipinfo['query']['city']
             data['state'] = searchByState(zipinfo['query']['state'])
             data['zipcode'] = random.choice(zipinfo['results'])
+            data['long'] = ""
+            data['lat'] = ""
 
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
             data['city'] = zipinfo['results'][code][0]['city']
             data['state'] = searchByState(zipinfo['results'][code][0]['state'])
             data['zipcode'] = zipinfo['results'][code][0]['postal_code']
+            data['long'] = ""
+            data['lat'] = ""
 
         else:
             data = None
@@ -480,12 +666,32 @@ def normalize_zipinfo(zipinfo=None):
 
 
 def searchByState(state):
-    for key, value in states.items():
+    """search by state
+    Pass in long name state and return abbreviated state name
+
+    Args:
+        state (string): full state name
+
+    Returns:
+        string: abbreviated state name
+    """
+    for key, value in STATES.items():
         if state in value:
             return key.capitalize()
 
 
 def getInfo(url, headers=None, params=None):
+    """ Primary Url connector - uses the requests
+    library to pull content from the web.
+
+    Args:
+        string: url
+        dict: optional header info
+        params: optional params info
+
+    Returns:
+        dict: url data
+    """
     try:
         result = requests.get(url, headers=headers, params=params)
         result.raise_for_status()
