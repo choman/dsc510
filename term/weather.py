@@ -95,9 +95,9 @@ METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
 
 DEGREES = {
-   IMPERIAL: chr(176) + 'F',
-   METRIC:   chr(176) + 'C',
-   STANDARD: chr(176) + 'K',
+   IMPERIAL: f'{DEGREE}F',
+   METRIC:   f'{DEGREE}C',
+   STANDARD: f'{DEGREE}K',
 }
 
 STATES = {
@@ -187,7 +187,7 @@ def main():
 
 def welcome():
     print()
-    print("Welcome for Chad's Weather Machine")
+    print("Welcome for Chad's Weather Machine!")
     print()
     print('Follow the directions')
     print('   - All output is in imperial format')
@@ -216,7 +216,7 @@ def getLocation():
         units = requestWeatherType()
 
         zipinfo = verifyLocation(location, search)
-        print_debug("zipinfo = {zipinfo}")
+        print_debug(f'zipinfo = {zipinfo}')
 
         if zipinfo:
             weather_info = getWeather(zipinfo, units)
@@ -334,7 +334,7 @@ def display_Weather(weather, zipinfo, units=IMPERIAL):
     wheader = (
       f"Current weather in {zipinfo['city']}, "
       f"{zipinfo['state']} {zipinfo['zipcode']} "
-      f" ({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
+      f"({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
     )
     print(wheader)
 
@@ -407,7 +407,7 @@ def print_sea_level(key, value, units=IMPERIAL):
     Returns:
         Nothing
     """
-    print_pressure("Sea Level", value, units=IMPERIAL)
+    print_pressure('Sea Level', value, units=IMPERIAL)
 
 
 def print_grnd_level(key, value, units=IMPERIAL):
@@ -420,7 +420,7 @@ def print_grnd_level(key, value, units=IMPERIAL):
     Returns:
         Nothing
     """
-    print_pressure("Ground Level", value, units=IMPERIAL)
+    print_pressure('Ground Level', value, units=IMPERIAL)
 
 
 def print_pressure(key, value, units=IMPERIAL):
@@ -531,18 +531,18 @@ def print_wind(key, value, units=IMPERIAL):
     """
     for k, v in value.items():
         if 'deg' in k:
-            key = format_title(f"Wind direction")
+            key = format_title('Wind direction')
             cardinal_direction = getWindDirection(value['deg'])
             svalue = f"{cardinal_direction} - {value['deg']}{DEGREE}"
 
         else:
-            key = format_title(f"Wind {k}")
+            key = format_title(f'Wind {k}')
             if METRIC in units:
-                tag = "m/s"
+                tag = 'm/s'
             else:
-                tag = "mph"
+                tag = 'mph'
 
-            svalue = f"{value[k]}{tag}"
+            svalue = f'{value[k]}{tag}'
 
         print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
@@ -698,9 +698,9 @@ def getWindDirection(degree):
     idx = ix % len(WIND_DIRS)
 
     if USE_ARROWS:
-        result = f"{WIND_DIRS[idx]} {WIND_ARROWS[idx]}"
+        result = f'{WIND_DIRS[idx]} {WIND_ARROWS[idx]}'
     else:
-        result = f"{WIND_DIRS[idx]}"
+        result = f'{WIND_DIRS[idx]}'
 
     return result
 
