@@ -45,6 +45,7 @@
 #                                   Corrected hPa math to X in water
 #                                   added logic for metric and standard
 #                                   added wind arrow - unicode
+#                                   sanity check on loc
 #  Chad Homan     2021-02-28        Added cardinal wind direction
 #                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
@@ -166,6 +167,7 @@ WIND_DIRS = [
     'W', 'WNW', 'NW', 'NNW'
 ]
 
+# cardinal direction arrows in unicode
 if USE_ARROWS:
     WIND_ARROWS = [
         '\u2193', '\u2199', '\u2199', '\u2199',
@@ -306,8 +308,6 @@ def display_Weather(weather, zipinfo, units=IMPERIAL):
     Returns:
         Nothing
     """
-    # XXX
-##    print(weather)
     temps = weather['main']
     print_calls = {
         'humidity':   print_humidity,
@@ -378,10 +378,9 @@ def format_title(key):
         key (string): description of data
 
     Returns:
-        key (string): formated
+        (string): formatted
     """
-    key = f' {key.title()}:'
-    return key
+    return f' {key.title()}:'
 
 
 def print_humidity(key, value, units=IMPERIAL):
@@ -575,7 +574,12 @@ def print_snow_rain(key, value, units=IMPERIAL):
     """
     key = format_title(key)
     for k, v in value.items():
-        value = f'{k}: {v * MM2INCH:.2f}in'
+        if METRIC in units:
+            value = f'{k}: {v:.2f}mm'
+
+        else:
+            value = f'{k}: {v * MM2INCH:.2f}in'
+
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
@@ -604,7 +608,8 @@ def print_riseset(title, value, tz):
         Nothing
     """
     key = format_title(title)
-    date = datetime.datetime.fromtimestamp(value)
+
+#    date = datetime.datetime.fromtimestamp(value)
 
     gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
     lvalue = time.strftime('%H:%M %Z', time.localtime(value))
@@ -654,7 +659,12 @@ def verifyLocationByAPI(loc, search):
         zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
     elif ',' in loc:
-        city, state = loc.split(',')
+        if loc.count(',') > 1:
+            city, state, junk = loc.split(',')
+
+        else:
+            city, state = loc.split(',')
+
         city  = city.strip()
         state = state.strip()
 
