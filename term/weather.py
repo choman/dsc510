@@ -42,6 +42,8 @@
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-03-02        Implemented a template for docstrings
+#                                   Corrected hPa math to X in water
+#                                   added logic for metric and standard
 #  Chad Homan     2021-02-28        Added cardinal wind direction
 #                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
@@ -70,79 +72,91 @@ except ModuleNotFoundError:
     USE_USZIPCODE = False
 
 QUIT         = 'q'
+DEGREE_C     = chr(176) + 'C'
 DEGREE_F     = chr(176) + 'F'
 DEGREE       = chr(176)
-HPA2INCH     = .02953
+HPA2INCH     = .401463
+HPA2CM       = 1.01972
 METER2MILE   = .000621371
 MM2INCH      = .0393701
 LJUST        = 20
 RJUST        = 1
 DEBUG        = False
-UNITS        = 'imperial'
 WEATHER_URL  = 'https://api.openweathermap.org/data/2.5/weather'
 WEATHER_KEY  = 'af6ca8a2c9759b2d33ec039bd9c21bbd'
 ZIPCODE_CODE = 'https://app.zipcodebase.com/api/v1/search'
 ZIPCODE_CITY = 'https://app.zipcodebase.com/api/v1/code/city'
 ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 
+IMPERIAL     = 'imperial' # fahrenhite
+METRIC       = 'metric'   # celcius
+STANDARD     = 'standard' # kelvin
+UNITS        = IMPERIAL
+
+DEGREES = {
+   IMPERIAL: chr(176) + 'F',
+   METRIC:   chr(176) + 'C',
+   STANDARD: chr(176) + 'K',
+}
+
 STATES = {
-        'AK': 'Alaska',
-        'AL': 'Alabama',
-        'AR': 'Arkansas',
-        'AS': 'American Samoa',
-        'AZ': 'Arizona',
-        'CA': 'California',
-        'CO': 'Colorado',
-        'CT': 'Connecticut',
-        'DC': 'District of Columbia',
-        'DE': 'Delaware',
-        'FL': 'Florida',
-        'GA': 'Georgia',
-        'GU': 'Guam',
-        'HI': 'Hawaii',
-        'IA': 'Iowa',
-        'ID': 'Idaho',
-        'IL': 'Illinois',
-        'IN': 'Indiana',
-        'KS': 'Kansas',
-        'KY': 'Kentucky',
-        'LA': 'Louisiana',
-        'MA': 'Massachusetts',
-        'MD': 'Maryland',
-        'ME': 'Maine',
-        'MI': 'Michigan',
-        'MN': 'Minnesota',
-        'MO': 'Missouri',
-        'MP': 'Northern Mariana Islands',
-        'MS': 'Mississippi',
-        'MT': 'Montana',
-        'NA': 'National',
-        'NC': 'North Carolina',
-        'ND': 'North Dakota',
-        'NE': 'Nebraska',
-        'NH': 'New Hampshire',
-        'NJ': 'New Jersey',
-        'NM': 'New Mexico',
-        'NV': 'Nevada',
-        'NY': 'New York',
-        'OH': 'Ohio',
-        'OK': 'Oklahoma',
-        'OR': 'Oregon',
-        'PA': 'Pennsylvania',
-        'PR': 'Puerto Rico',
-        'RI': 'Rhode Island',
-        'SC': 'South Carolina',
-        'SD': 'South Dakota',
-        'TN': 'Tennessee',
-        'TX': 'Texas',
-        'UT': 'Utah',
-        'VA': 'Virginia',
-        'VI': 'Virgin Islands',
-        'VT': 'Vermont',
-        'WA': 'Washington',
-        'WI': 'Wisconsin',
-        'WV': 'West Virginia',
-        'WY': 'Wyoming'
+    'AK': 'Alaska',
+    'AL': 'Alabama',
+    'AR': 'Arkansas',
+    'AS': 'American Samoa',
+    'AZ': 'Arizona',
+    'CA': 'California',
+    'CO': 'Colorado',
+    'CT': 'Connecticut',
+    'DC': 'District of Columbia',
+    'DE': 'Delaware',
+    'FL': 'Florida',
+    'GA': 'Georgia',
+    'GU': 'Guam',
+    'HI': 'Hawaii',
+    'IA': 'Iowa',
+    'ID': 'Idaho',
+    'IL': 'Illinois',
+    'IN': 'Indiana',
+    'KS': 'Kansas',
+    'KY': 'Kentucky',
+    'LA': 'Louisiana',
+    'MA': 'Massachusetts',
+    'MD': 'Maryland',
+    'ME': 'Maine',
+    'MI': 'Michigan',
+    'MN': 'Minnesota',
+    'MO': 'Missouri',
+    'MP': 'Northern Mariana Islands',
+    'MS': 'Mississippi',
+    'MT': 'Montana',
+    'NA': 'National',
+    'NC': 'North Carolina',
+    'ND': 'North Dakota',
+    'NE': 'Nebraska',
+    'NH': 'New Hampshire',
+    'NJ': 'New Jersey',
+    'NM': 'New Mexico',
+    'NV': 'Nevada',
+    'NY': 'New York',
+    'OH': 'Ohio',
+    'OK': 'Oklahoma',
+    'OR': 'Oregon',
+    'PA': 'Pennsylvania',
+    'PR': 'Puerto Rico',
+    'RI': 'Rhode Island',
+    'SC': 'South Carolina',
+    'SD': 'South Dakota',
+    'TN': 'Tennessee',
+    'TX': 'Texas',
+    'UT': 'Utah',
+    'VA': 'Virginia',
+    'VI': 'Virgin Islands',
+    'VT': 'Vermont',
+    'WA': 'Washington',
+    'WI': 'Wisconsin',
+    'WV': 'West Virginia',
+    'WY': 'Wyoming'
 }
 
 wind_dirs = [
@@ -150,7 +164,7 @@ wind_dirs = [
     'E', 'ESE', 'SE', 'SSE',
     'S', 'SSW', 'SW', 'WSW',
     'W', 'WNW', 'NW', 'NNW'
-    ]
+]
 
 
 # function: main()
@@ -184,24 +198,58 @@ def getLocation():
         search = uszipcode.SearchEngine(simple_zipcode=True)
 
     while True:
-        print()
-        print()
-        location = input('Enter location (<zip> or <city, state>): ').strip()
-
-        if location.lower() in QUIT:
-            sys.exit()
+        location = requestWeatherLocation()
+        units = requestWeatherType()
 
         zipinfo = verifyLocation(location, search)
         print_debug("zipinfo = {zipinfo}")
 
         if zipinfo:
-            weather_info = getWeather(zipinfo)
-            display_Weather(weather_info, zipinfo)
+            weather_info = getWeather(zipinfo, units)
+            display_Weather(weather_info, zipinfo, units)
 
     print_debug(f'location = {location}')
 
 
-def getWeather(zip):
+def requestWeatherLocation():
+    """Get weather location
+
+    Returns:
+        location (string): location city/state || zip
+    """
+    print()
+    print()
+    location = input('Enter location (<zip> or <city, state>): ').strip()
+
+    if location.lower() in QUIT:
+       sys.exit()
+
+    return location
+
+
+def requestWeatherType():
+    """get weather type (imperial, metric, kelvin/standard)
+
+    Returns:
+        UNITS (string): weather type
+    """
+    print()
+    print('How would you like to view the weather?')
+    view = input('(F)ahrenheit, (C)elsius, (K)elvin [F]: ').strip()
+
+    if 'k' in view.lower():
+        units = STANDARD
+
+    elif 'c' in view.lower():
+        units = METRIC
+
+    else:
+        units = IMPERIAL
+
+    return units
+
+
+def getWeather(zip, units=UNITS):
     """Get wether info from openweather map
 
     Args:
@@ -211,7 +259,7 @@ def getWeather(zip):
         data (dict): weather data
     """
     url_data = {
-        'units': UNITS,
+        'units': units,
         'appid': WEATHER_KEY,
         'zip':   zip['zipcode'],
     }
@@ -236,7 +284,7 @@ def print_debug(msg):
         print(f'DEBUG: {msg}')
 
 
-def display_Weather(weather, zipinfo):
+def display_Weather(weather, zipinfo, units=UNITS):
     """driver for weather display
 
     Args:
@@ -246,10 +294,13 @@ def display_Weather(weather, zipinfo):
     Returns:
         Nothing
     """
+    print (weather)
     temps = weather['main']
     print_calls = {
         'humidity':   print_humidity,
         'pressure':   print_pressure,
+        'grnd_level': print_grnd_level,
+        'sea_level':  print_sea_level,
         'temp_max':   print_temp_max,
         'temp_min':   print_temp_min,
         'feels_like': print_feels_like,
@@ -276,28 +327,34 @@ def display_Weather(weather, zipinfo):
     print_debug(temps)
     for k, v in temps.items():
         if k in print_calls:
-            print_calls[k](k, v)
+            print_calls[k](k, v, units)
 
     print()
     print_desc(weather)
 
+    tz = weather['timezone']
+
     for k, v in weather.items():
         if k in print_calls:
-            print_calls[k](k, v)
+            if 'sys' in k:
+               print_calls[k](k, v, units, tz)
+            else:
+               print_calls[k](k, v, units)
 
 
 def print_desc(weather):
     """Prepare and display weather description info
 
     Args:
-        weather (list): weather secriptions
+        weather (list): weather descriptions
 
     Returns:
          nothing
     """
     key = format_title('Description')
     for desc in weather['weather']:
-        print(f"{key:<{LJUST}}{desc['description'].capitalize()}")
+        extra = f"{desc['description'].capitalize()}"
+        print(f"{key:<{LJUST}}{desc['main']}, {extra}")
 
 
 def format_title(key):
@@ -313,7 +370,7 @@ def format_title(key):
     return key
 
 
-def print_humidity(key, value):
+def print_humidity(key, value, units=UNITS):
     """Prepare and display humidity info
 
     Args:
@@ -327,7 +384,33 @@ def print_humidity(key, value):
     print(f'{key:<{LJUST}}{value:>{RJUST}}%')
 
 
-def print_pressure(key, value):
+def print_sea_level(key, value, units=UNITS):
+    """Prepare and display pressure info
+
+    Args:
+        key (string): description of data
+        value (float): pressure data in HPA
+
+    Returns:
+        Nothing
+    """
+    print_pressure("Sea Level", value, units=UNITS)
+
+
+def print_grnd_level(key, value, units=UNITS):
+    """Prepare and display pressure info
+
+    Args:
+        key (string): description of data
+        value (float): pressure data in HPA
+
+    Returns:
+        Nothing
+    """
+    print_pressure("Ground Level", value, units=UNITS)
+
+
+def print_pressure(key, value, units=UNITS):
     """Prepare and display pressure info
 
     Args:
@@ -338,11 +421,17 @@ def print_pressure(key, value):
         Nothing
     """
     key = format_title(key)
-    value = f'{value * HPA2INCH:.2f}in'
+
+    if METRIC in units:
+        value = f'{value}hPa ({value * HPA2CM:.2f}cm)'
+
+    else:
+        value = f'{value}hPa ({value * HPA2INCH:.2f}in)'
+
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_temp(key, value):
+def print_temp(key, value, units=UNITS):
     """Prepare and display various temp info
 
     Args:
@@ -353,11 +442,11 @@ def print_temp(key, value):
         Nothing
     """
     key = format_title(key)
-    value = f'{value}{DEGREE_F}'
+    value = f'{value}{DEGREES[units]}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_feels_like(key, value):
+def print_feels_like(key, value, units=UNITS):
     """Prepare feels like temp info
 
     Args:
@@ -367,10 +456,10 @@ def print_feels_like(key, value):
     Returns:
         Nothing
     """
-    print_temp('Feels Like', value)
+    print_temp('Feels Like', value, units)
 
 
-def print_temp_max(key, value):
+def print_temp_max(key, value, units=UNITS):
     """Prepare high temp info
 
     Args:
@@ -380,10 +469,10 @@ def print_temp_max(key, value):
     Returns:
         Nothing
     """
-    print_temp('High', value)
+    print_temp('High', value, units)
 
 
-def print_temp_min(key, value):
+def print_temp_min(key, value, units=UNITS):
     """Prepare low temp info
 
     Args:
@@ -393,10 +482,10 @@ def print_temp_min(key, value):
     Returns:
         Nothing
     """
-    print_temp('Low', value)
+    print_temp('Low', value, units)
 
 
-def print_visibility(key, value):
+def print_visibility(key, value, units=UNITS):
     """Prepare and display visibility info
 
     Args:
@@ -407,11 +496,17 @@ def print_visibility(key, value):
         Nothing
     """
     key = format_title(key)
-    value = f'{value * METER2MILE:.2f}mi'
+
+    if METRIC in units:
+        value = f'{value:.2f}m'
+
+    else:
+        value = f'{value * METER2MILE:.2f}mi'
+
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_wind(key, value):
+def print_wind(key, value, units=UNITS):
     """Prepare and display wind info
 
     Args:
@@ -421,18 +516,25 @@ def print_wind(key, value):
     Returns:
         Nothing
     """
-    key = format_title(key)
-    cardinal_direction = getWindDirection(value['deg'])
+    for k, v in value.items():
+        if 'deg' in k:
+            key = format_title(f"Wind direction")
+            cardinal_direction = getWindDirection(value['deg'])
+            svalue = f"{cardinal_direction} - {value['deg']}{DEGREE}"
 
-    svalue = f"{value['speed']}mph"
-    print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
+        else:
+            key = format_title(f"Wind {k}")
+            if METRIC in units:
+                tag = "m/s"
+            else:
+                tag = "mph"
 
-    key = format_title("Wind Direction")
-    svalue = f"{cardinal_direction} - {value['deg']}{DEGREE}"
-    print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
+            svalue = f"{value['speed']}{tag}"
+
+        print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
 
-def print_clouds(key, value):
+def print_clouds(key, value, units=UNITS):
     """Prepare and display cloud info
 
     Args:
@@ -447,7 +549,7 @@ def print_clouds(key, value):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_snow_rain(key, value):
+def print_snow_rain(key, value, units=UNITS):
     """Prepare and display snow/rain info
 
     Args:
@@ -463,7 +565,7 @@ def print_snow_rain(key, value):
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_sys(key, value):
+def print_sys(key, value, tz=None, units=UNITS):
     """Driver/Prepare display of the sunrise/sunset
 
     Args:
@@ -473,11 +575,11 @@ def print_sys(key, value):
     Returns:
         Nothing
     """
-    print_riseset('Sunrise', value['sunrise'])
-    print_riseset('Sunset', value['sunset'])
+    print_riseset('Sunrise', value['sunrise'], tz)
+    print_riseset('Sunset', value['sunset'], tz)
 
 
-def print_riseset(title, value):
+def print_riseset(title, value, tz):
     """Actual display of the sunrise/sunset
 
     Args:
@@ -488,8 +590,10 @@ def print_riseset(title, value):
         Nothing
     """
     key = format_title(title)
-    value = time.strftime('%H:%M', time.localtime(value))
-    print(f'{key:<{LJUST}}{value:>{RJUST}}')
+    gvalue = time.strftime('%H:%M', time.gmtime(value))
+    lvalue = time.strftime('%H:%M', time.localtime(value))
+    #lvalue = time.strftime('%H:%M', time.gmtime(value + int(tz)))
+    print(f'{key:<{LJUST}}{lvalue}CST ({gvalue:>{RJUST}}UTC)')
 
 
 def verifyLocation(loc, search=None):
