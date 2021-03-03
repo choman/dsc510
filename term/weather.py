@@ -99,6 +99,12 @@ DEGREES = {
    STANDARD: f'{DEGREE}K',
 }
 
+VIEW_TYPE = {
+   'f': IMPERIAL,
+   'c': METRIC,
+   'k': STANDARD,
+}
+
 STATES = {
     'AK': 'Alaska',
     'AL': 'Alabama',
@@ -234,7 +240,7 @@ def requestWeatherLocation():
     print()
     location = input('Enter location (<zip> or <city, state>): ').strip()
 
-    if location.lower() in QUIT:
+    if not len(location) or location.lower() in QUIT:
         sys.exit()
 
     return location
@@ -249,15 +255,7 @@ def requestWeatherType():
     print()
     print('How would you like to view the weather?')
     view = input('(F)ahrenheit, (C)elsius, (K)elvin [F]: ').strip()
-
-    if 'k' in view.lower():
-        units = STANDARD
-
-    elif 'c' in view.lower():
-        units = METRIC
-
-    else:
-        units = IMPERIAL
+    units = VIEW_TYPE.setdefault(view.lower(), IMPERIAL)
 
     return units
 
