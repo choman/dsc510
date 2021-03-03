@@ -100,12 +100,6 @@ DEGREES = {
    STANDARD: f'{DEGREE}K',
 }
 
-VIEW_TYPE = {
-   'f': IMPERIAL,
-   'c': METRIC,
-   'k': STANDARD,
-}
-
 STATES = {
     'AK': 'Alaska',
     'AL': 'Alabama',
@@ -256,7 +250,15 @@ def requestWeatherType():
     print()
     print('How would you like to view the weather?')
     view = input('(F)ahrenheit, (C)elsius, (K)elvin [F]: ').strip()
-    units = VIEW_TYPE.setdefault(view.lower(), IMPERIAL)
+
+    if 'k' in view.lower():
+        units = STANDARD
+
+    elif 'c' in view.lower():
+        units = METRIC
+
+    else:
+        units = IMPERIAL
 
     return units
 
@@ -779,18 +781,16 @@ def normalize_zipinfo(zipinfo=None):
 
     elif 'query' in zipinfo:
         if 'city' in zipinfo['query']:
-            data['city'] = zipinfo['query']['city']
-            data['state'] = getStateAbbreviation(zipinfo['query']['state'])
-            data['zipcode'] = random.choice(zipinfo['results'])
+            results = zipinfo['query']
+            results['postal_code'] = random.choice(zipinfo['results'])
 
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
-            data['city'] = zipinfo['results'][code][0]['city']
-            data['state'] = getStateAbbreviation(zipinfo['results'][code][0]['state'])
-            data['zipcode'] = zipinfo['results'][code][0]['postal_code']
+            results = zipinfo['results'][code][0]
 
-        else:
-            data = None
+        data['city'] = results['city']
+        data['state'] = getStateAbbreviation(results['state'])
+        data['zipcode'] = results['postal_code']
 
     else:
         data = None
