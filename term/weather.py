@@ -260,7 +260,7 @@ def requestWeatherLocation():
             continue
 
         elif not set(location).difference(string.ascii_letters +
-                                          string.whitespace + 
+                                          string.whitespace +
                                           ',-\'.'):
 
             if not USE_USZIPCODE:
@@ -275,7 +275,7 @@ def requestWeatherLocation():
                 if location.startswith("st"):
                     location = location.replace("st", "saint")
 
-                break
+            break
 
         else:
             print(warn_msg)
@@ -755,7 +755,6 @@ def verifyLocationByURL(loc):
             ('country', 'us'),
         )
 
-
         url = ZIPCODE_CODE
 
     elif ',' in loc:
@@ -768,7 +767,8 @@ def verifyLocationByURL(loc):
         )
 
         url = ZIPCODE_CITY
-    
+
+    params = urllib.parse.urlencode(params)
     zipinfo = getInfo(url, headers=headers, params=params)
 
     if not len(zipinfo['results']):
