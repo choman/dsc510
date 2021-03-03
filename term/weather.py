@@ -45,6 +45,8 @@
 #                                   Corrected hPa math to X in water
 #                                   added logic for metric and standard
 #                                   added wind arrow - unicode
+#                                   sanity check on loc
+#                                   simplified city state normalization
 #  Chad Homan     2021-02-28        Added cardinal wind direction
 #                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
@@ -58,12 +60,13 @@
 #  Chad Homan     2021-02-08        primary header
 #
 
-import datetime
 import json
 import random
 import requests
+import string
 import sys
 import time
+import urllib
 
 try:
     import uszipcode
@@ -94,9 +97,9 @@ METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
 
 DEGREES = {
-   IMPERIAL: chr(176) + 'F',
-   METRIC:   chr(176) + 'C',
-   STANDARD: chr(176) + 'K',
+   IMPERIAL: f'{DEGREE}F',
+   METRIC:   f'{DEGREE}C',
+   STANDARD: f'{DEGREE}K',
 }
 
 STATES = {
@@ -166,6 +169,16 @@ WIND_DIRS = [
     'W', 'WNW', 'NW', 'NNW'
 ]
 
+SPECIAL_CITIES = {
+    "wilkes-barre, pa": "wilkes barre, pa",
+    "fuquay-varina, nc": "fuquay varina, nc",
+    "sedro-woolley, wa": "sedro woolley, wa",
+    "dover-foxcroft, me": "dover foxcroft, me",
+    "o'fallon, il": "o fallon, il",
+
+}
+
+# cardinal direction arrows in unicode
 if USE_ARROWS:
     WIND_ARROWS = [
         '\u2193', '\u2199', '\u2199', '\u2199',
@@ -185,7 +198,7 @@ def main():
 
 def welcome():
     print()
-    print("Welcome for Chad's Weather Machine")
+    print("Welcome to Chad's Weather Machine!")
     print()
     print('Follow the directions')
     print('   - All output is in imperial format')
@@ -214,7 +227,7 @@ def getLocation():
         units = requestWeatherType()
 
         zipinfo = verifyLocation(location, search)
-        print_debug("zipinfo = {zipinfo}")
+        print_debug(f'zipinfo = {zipinfo}')
 
         if zipinfo:
             weather_info = getWeather(zipinfo, units)
@@ -229,12 +242,43 @@ def requestWeatherLocation():
     Returns:
         location (string): location city/state || zip
     """
-    print()
-    print()
-    location = input('Enter location (<zip> or <city, state>): ').strip()
+    warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
 
-    if location.lower() in QUIT:
-        sys.exit()
+    print()
+    while True:
+        print()
+        location = input('Enter location (<zip> or <city, state>): ').strip()
+
+        if not len(location) or location.lower() in QUIT:
+            sys.exit()
+
+        if location.isdigit() and len(location) == 5:
+            break
+
+        elif ',' not in location:
+            print(warn_msg)
+            continue
+
+        elif not set(location).difference(string.ascii_letters +
+                                          string.whitespace + 
+                                          ',-\'.'):
+
+            if not USE_USZIPCODE:
+                location = location.lower()
+
+                if location in SPECIAL_CITIES:
+                    location = SPECIAL_CITIES[location]
+
+                if location.startswith("st."):
+                    location = location.replace("st.", "saint")
+
+                if location.startswith("st"):
+                    location = location.replace("st", "saint")
+
+                break
+
+        else:
+            print(warn_msg)
 
     return location
 
@@ -306,8 +350,6 @@ def display_Weather(weather, zipinfo, units=IMPERIAL):
     Returns:
         Nothing
     """
-    # XXX
-##    print(weather)
     temps = weather['main']
     print_calls = {
         'humidity':   print_humidity,
@@ -326,34 +368,33 @@ def display_Weather(weather, zipinfo, units=IMPERIAL):
         'rain':       print_snow_rain,
     }
 
+    wheader = (
+      f"Current weather in {zipinfo['city']}, "
+      f"{zipinfo['state']} {zipinfo['zipcode']} "
+      f"({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
+    )
+
+    def process_items(data):
+        """Internal function to process weather data
+
+        Args: data (dict): weather data
+        Returns: nothing
+        """
+        print_debug(data)
+        for k, v in data.items():
+            if k in print_calls:
+                print_calls[k](k, v, units)
+
     print_debug(weather)
     print_debug(weather['weather'])
     print_debug(weather['main'])
 
     print()
-    wheader = (
-      f"Current weather in {zipinfo['city']}, "
-      f"{zipinfo['state']} {zipinfo['zipcode']} "
-      f" ({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
-    )
     print(wheader)
-
-    print_debug(temps)
-    for k, v in temps.items():
-        if k in print_calls:
-            print_calls[k](k, v, units)
-
+    process_items(temps)
     print()
     print_desc(weather)
-
-    tz = weather['timezone']
-
-    for k, v in weather.items():
-        if k in print_calls:
-            if 'sys' in k:
-                print_calls[k](k, v, units, tz)
-            else:
-                print_calls[k](k, v, units)
+    process_items(weather)
 
 
 def print_desc(weather):
@@ -378,10 +419,9 @@ def format_title(key):
         key (string): description of data
 
     Returns:
-        key (string): formated
+        (string): formatted
     """
-    key = f' {key.title()}:'
-    return key
+    return f' {key.title()}:'
 
 
 def print_humidity(key, value, units=IMPERIAL):
@@ -408,7 +448,7 @@ def print_sea_level(key, value, units=IMPERIAL):
     Returns:
         Nothing
     """
-    print_pressure("Sea Level", value, units=IMPERIAL)
+    print_pressure('Sea Level', value, units=IMPERIAL)
 
 
 def print_grnd_level(key, value, units=IMPERIAL):
@@ -421,7 +461,7 @@ def print_grnd_level(key, value, units=IMPERIAL):
     Returns:
         Nothing
     """
-    print_pressure("Ground Level", value, units=IMPERIAL)
+    print_pressure('Ground Level', value, units=IMPERIAL)
 
 
 def print_pressure(key, value, units=IMPERIAL):
@@ -456,7 +496,7 @@ def print_temp(key, value, units=IMPERIAL):
         Nothing
     """
     key = format_title(key)
-    value = f'{value}{DEGREES[units]}'
+    value = f'{value:.1f}{DEGREES[units]}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
@@ -532,18 +572,18 @@ def print_wind(key, value, units=IMPERIAL):
     """
     for k, v in value.items():
         if 'deg' in k:
-            key = format_title(f"Wind direction")
+            key = format_title('Wind direction')
             cardinal_direction = getWindDirection(value['deg'])
             svalue = f"{cardinal_direction} - {value['deg']}{DEGREE}"
 
         else:
-            key = format_title(f"Wind {k}")
-            if METRIC in units:
-                tag = "m/s"
-            else:
-                tag = "mph"
+            key = format_title(f'Wind {k}')
+            tag = 'mph'
 
-            svalue = f"{value[k]}{tag}"
+            if METRIC in units:
+                tag = 'm/s'
+
+            svalue = f'{value[k]}{tag}'
 
         print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
@@ -575,11 +615,16 @@ def print_snow_rain(key, value, units=IMPERIAL):
     """
     key = format_title(key)
     for k, v in value.items():
-        value = f'{k}: {v * MM2INCH:.2f}in'
+        if METRIC in units:
+            value = f'{k}: {v:.2f}mm'
+
+        else:
+            value = f'{k}: {v * MM2INCH:.2f}in'
+
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_sys(key, value, units=IMPERIAL, tz=None):
+def print_sys(key, value, units=IMPERIAL):
     """Driver/Prepare display of the sunrise/sunset
 
     Args:
@@ -589,11 +634,11 @@ def print_sys(key, value, units=IMPERIAL, tz=None):
     Returns:j
         Nothing
     """
-    print_riseset('Sunrise', value['sunrise'], tz)
-    print_riseset('Sunset', value['sunset'], tz)
+    print_riseset('Sunrise', value['sunrise'])
+    print_riseset('Sunset', value['sunset'])
 
 
-def print_riseset(title, value, tz):
+def print_riseset(title, value):
     """Actual display of the sunrise/sunset
 
     Args:
@@ -604,8 +649,6 @@ def print_riseset(title, value, tz):
         Nothing
     """
     key = format_title(title)
-    date = datetime.datetime.fromtimestamp(value)
-
     gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
     lvalue = time.strftime('%H:%M %Z', time.localtime(value))
 
@@ -626,6 +669,7 @@ def verifyLocation(loc, search=None):
 
     if search is None:
         zipinfo = verifyLocationByURL(loc)
+
     else:
         zipinfo = verifyLocationByAPI(loc, search)
 
@@ -654,9 +698,7 @@ def verifyLocationByAPI(loc, search):
         zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
     elif ',' in loc:
-        city, state = loc.split(',')
-        city  = city.strip()
-        state = state.strip()
+        city, state = getCityState(loc)
 
         try:
             zipinfo = random.choice(search.by_city_and_state(city, state))
@@ -687,10 +729,9 @@ def getWindDirection(degree):
     ix = round(degree / (360 / len(WIND_DIRS)))
     idx = ix % len(WIND_DIRS)
 
+    result = f'{WIND_DIRS[idx]}'
     if USE_ARROWS:
-        result = f"{WIND_DIRS[idx]} {WIND_ARROWS[idx]}"
-    else:
-        result = f"{WIND_DIRS[idx]}"
+        result = f'{WIND_DIRS[idx]} {WIND_ARROWS[idx]}'
 
     return result
 
@@ -709,39 +750,47 @@ def verifyLocationByURL(loc):
     }
 
     if loc.isdigit() and len(loc) == 5:
-        zipinfo = loc
         params = (
             ('codes', f'{loc}'),
             ('country', 'us'),
         )
 
-        zipinfo = getInfo(ZIPCODE_CODE, headers=headers, params=params)
 
-        if not len(zipinfo['results']):
-            zipinfo = None
-
-        else:
-            zipinfo = normalize_zipinfo(zipinfo=zipinfo)
+        url = ZIPCODE_CODE
 
     elif ',' in loc:
-        city, state = loc.split(',')
-        city  = city.strip()
-        state = state.strip()
+        city, state = getCityState(loc)
 
-        zipinfo = f'{city},{state}'
         params = (
             ('city', f'{city.title()}'),
             ('state_name', f'{STATES.get(state.upper(), None)}'),
             ('country', 'us'.upper()),
         )
 
-        zipinfo = getInfo(ZIPCODE_CITY, headers=headers, params=params)
-        if not len(zipinfo['results']):
-            zipinfo = None
-        else:
-            zipinfo = normalize_zipinfo(zipinfo=zipinfo)
+        url = ZIPCODE_CITY
+    
+    zipinfo = getInfo(url, headers=headers, params=params)
 
+    if not len(zipinfo['results']):
+        return None
+
+    zipinfo = normalize_zipinfo(zipinfo=zipinfo)
     return zipinfo
+
+
+def getCityState(location):
+    """Normalize city and state
+    Args:
+        location (string): city, state
+
+    Returns:
+        city (string): city
+        state (string): state
+    """
+    city  = location.split(',')[0].strip().title()
+    state = location.split(',')[1].strip().title()
+
+    return city, state
 
 
 def normalize_zipinfo(zipinfo=None):
@@ -767,18 +816,16 @@ def normalize_zipinfo(zipinfo=None):
 
     elif 'query' in zipinfo:
         if 'city' in zipinfo['query']:
-            data['city'] = zipinfo['query']['city']
-            data['state'] = searchByState(zipinfo['query']['state'])
-            data['zipcode'] = random.choice(zipinfo['results'])
+            results = zipinfo['query']
+            results['postal_code'] = random.choice(zipinfo['results'])
 
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
-            data['city'] = zipinfo['results'][code][0]['city']
-            data['state'] = searchByState(zipinfo['results'][code][0]['state'])
-            data['zipcode'] = zipinfo['results'][code][0]['postal_code']
+            results = zipinfo['results'][code][0]
 
-        else:
-            data = None
+        data['city'] = results['city']
+        data['state'] = getStateAbbreviation(results['state'])
+        data['zipcode'] = results['postal_code']
 
     else:
         data = None
@@ -786,8 +833,8 @@ def normalize_zipinfo(zipinfo=None):
     return data
 
 
-def searchByState(state):
-    """search by state
+def getStateAbbreviation(state):
+    """get state abbreviation
     Pass in long name state and return abbreviated state name
 
     Args:
@@ -797,7 +844,7 @@ def searchByState(state):
         string: abbreviated state name
     """
     for key, value in STATES.items():
-        if state in value:
+        if state.lower() in value.lower():
             return key.capitalize()
 
 
