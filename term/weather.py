@@ -653,14 +653,7 @@ def verifyLocationByAPI(loc, search):
         zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
     elif ',' in loc:
-        if loc.count(',') > 1:
-            city, state, junk = loc.split(',')
-
-        else:
-            city, state = loc.split(',')
-
-        city  = city.strip()
-        state = state.strip()
+        city, state = getCityState(loc)
 
         try:
             zipinfo = random.choice(search.by_city_and_state(city, state))
@@ -727,9 +720,7 @@ def verifyLocationByURL(loc):
             zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
     elif ',' in loc:
-        city, state = loc.split(',')
-        city  = city.strip()
-        state = state.strip()
+        city, state = getCityState(loc)
 
         zipinfo = f'{city},{state}'
         params = (
@@ -747,6 +738,21 @@ def verifyLocationByURL(loc):
             zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
     return zipinfo
+
+
+def getCityState(location):
+    """Normalize city and state
+    Args:
+        location (string): city, state
+
+    Returns:
+        city (string): city
+        state (string): state
+    """
+    city  = location.split(',')[0].strip()
+    state = location.split(',')[1].strip()
+
+    return city, state
 
 
 def normalize_zipinfo(zipinfo=None):
