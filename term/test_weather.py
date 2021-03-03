@@ -40,6 +40,34 @@ class TestWindDirection(unittest.TestCase):
         expected_string = f" {test_string.title()}:"
         self.assertEqual(weather.format_title(test_string), expected_string)
 
+    def validate_zip_by_api(self):
+        try:
+            import uszipcode
+
+        except ModuleNotFoundError:
+            return True
+
+        search = uszipcode.SearchEngine(simple_zipcode=True)
+
+        for zip in ["68046", "99999"]:
+            a = weather.verifyLocation(zip)
+            self.assertEqual(weather.verifyLocation(zip), a)
+
+    def validate_zip_by_url(self):
+        weather.USE_USZIPCODE = False
+
+        for zip in ["68046", "99999"]:
+            a = weather.verifyLocation(zip)
+            self.assertEqual(weather.verifyLocation(zip), a)
+
+    def test_get_state_abbriviation(self):
+        self.assertEqual(weather.getStateAbbreviation("Nebraska"), "Ne")
+        self.assertEqual(weather.getStateAbbreviation("wisconsin"), "Wi")
+
+    def test_get_city_state(self):
+        self.assertEqual(weather.getCityState("Omaha, NE"), ("Omaha", "Ne"))
+        self.assertEqual(weather.getCityState("Omaha, NE, US"), ("Omaha", "Ne"))
+
 
 if __name__ == "__main__":
     unittest.main()

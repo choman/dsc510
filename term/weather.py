@@ -46,6 +46,7 @@
 #                                   added logic for metric and standard
 #                                   added wind arrow - unicode
 #                                   sanity check on loc
+#                                   simplified city state normalization
 #  Chad Homan     2021-02-28        Added cardinal wind direction
 #                                   assistance from: https://bit.ly/2PskWDi
 #  Chad Homan     2021-02-17        added welcome() message
@@ -749,8 +750,8 @@ def getCityState(location):
         city (string): city
         state (string): state
     """
-    city  = location.split(',')[0].strip()
-    state = location.split(',')[1].strip()
+    city  = location.split(',')[0].strip().title()
+    state = location.split(',')[1].strip().title()
 
     return city, state
 
@@ -779,13 +780,13 @@ def normalize_zipinfo(zipinfo=None):
     elif 'query' in zipinfo:
         if 'city' in zipinfo['query']:
             data['city'] = zipinfo['query']['city']
-            data['state'] = searchByState(zipinfo['query']['state'])
+            data['state'] = getStateAbbreviation(zipinfo['query']['state'])
             data['zipcode'] = random.choice(zipinfo['results'])
 
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
             data['city'] = zipinfo['results'][code][0]['city']
-            data['state'] = searchByState(zipinfo['results'][code][0]['state'])
+            data['state'] = getStateAbbreviation(zipinfo['results'][code][0]['state'])
             data['zipcode'] = zipinfo['results'][code][0]['postal_code']
 
         else:
@@ -797,8 +798,8 @@ def normalize_zipinfo(zipinfo=None):
     return data
 
 
-def searchByState(state):
-    """search by state
+def getStateAbbreviation(state):
+    """get state abbreviation
     Pass in long name state and return abbreviated state name
 
     Args:
@@ -808,7 +809,7 @@ def searchByState(state):
         string: abbreviated state name
     """
     for key, value in STATES.items():
-        if state in value:
+        if state.lower() in value.lower():
             return key.capitalize()
 
 
