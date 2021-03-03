@@ -424,8 +424,8 @@ def print_desc(weather):
     """
     key = format_title('Description')
     for desc in weather['weather']:
-        extra = f"{desc['description'].capitalize()}"
-        print(f"{key:<{LJUST}}{desc['main']}, {extra}")
+        detail = f"{desc['description'].capitalize()}"
+        print(f"{key:<{LJUST}}{desc['main']}, {detail}")
 
 
 def format_title(key):
@@ -497,11 +497,14 @@ def print_pressure(key, value, units=None):
     key = format_title(key)
 
     if METRIC in units:
-        value = f'{value}hPa ({value * HPA2CM:.2f}cm)'
+        cvalue = value * HPA2CM
+        tag = 'cm'
 
     else:
-        value = f'{value}hPa ({value * HPA2INCH:.2f}in)'
+        cvalue = value * HPA2INCH
+        tag = 'in'
 
+    value = f'{value}hPa // {cvalue:.2f}{tag}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
@@ -575,14 +578,12 @@ def print_visibility(key, value, units=None):
         Nothing
     """
     key = format_title(key)
+    cvalue = f'{value * METER2MILE:.2f}mi'
 
     if METRIC in units:
-        value = f'{value:.2f}m'
+        cvalue = f'{value:.2f}m'
 
-    else:
-        value = f'{value * METER2MILE:.2f}mi'
-
-    print(f'{key:<{LJUST}}{value:>{RJUST}}')
+    print(f'{key:<{LJUST}}{cvalue:>{RJUST}}')
 
 
 def print_wind(key, value, units=None):
@@ -641,15 +642,14 @@ def print_snow_rain(key, value, units=None):
     Returns:
         Nothing
     """
-    key = format_title(key)
+    key = format_title(f"{key} volume")
     for k, v in value.items():
+        cvalue = f'{k}: {v * MM2INCH:.2f}in'
+
         if METRIC in units:
-            value = f'{k}: {v:.2f}mm'
+            cvalue = f'{k}: {v:.2f}mm'
 
-        else:
-            value = f'{k}: {v * MM2INCH:.2f}in'
-
-        print(f'{key:<{LJUST}}{value:>{RJUST}}')
+        print(f'{key:<{LJUST}}{cvalue:>{RJUST}}')
 
 
 def print_sys(key, value, units=None):
@@ -681,7 +681,7 @@ def print_riseset(title, value):
     gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
     lvalue = time.strftime('%H:%M %Z', time.localtime(value))
 
-    print(f'{key:<{LJUST}}{lvalue} ({gvalue:>{RJUST}})')
+    print(f'{key:<{LJUST}}{lvalue} // {gvalue:>{RJUST}}')
 
 
 def verifyLocation(loc, search=None):
