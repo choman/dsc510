@@ -873,7 +873,7 @@ def getStateAbbreviation(state):
         string: abbreviated state name
     """
     for key, value in STATES.items():
-        if value.lower() in state.lower():
+        if value.lower() == state.lower():
             return key.capitalize()
 
 
