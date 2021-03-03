@@ -264,21 +264,35 @@ def requestWeatherLocation():
                                           ',-\'.'):
 
             if not USE_USZIPCODE:
-                location = location.lower()
-
-                if location in SPECIAL_CITIES:
-                    location = SPECIAL_CITIES[location]
-
-                if location.startswith("st."):
-                    location = location.replace("st.", "saint")
-
-                if location.startswith("st"):
-                    location = location.replace("st", "saint")
+                location = sanatizeForURL(location)
 
             break
 
         else:
             print(warn_msg)
+
+    return location
+
+
+def sanatizeForURL(location):
+    """sanatizes city/state for zipcode URL
+
+    Args:
+        location (string): city, state
+
+    Returns:
+        location (string): sanatized citym state
+    """
+    location = location.lower()
+
+    if location in SPECIAL_CITIES:
+        location = SPECIAL_CITIES[location]
+
+    if location.startswith("st."):
+        location = location.replace("st.", "saint")
+
+    if location.startswith("st"):
+        location = location.replace("st", "saint")
 
     return location
 
@@ -305,11 +319,12 @@ def requestWeatherType():
     return units
 
 
-def getWeather(zip, units=IMPERIAL):
+def getWeather(zip, units=None):
     """Get wether info from openweather map
 
     Args:
         zip (int): zipdata
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         data (dict): weather data
@@ -340,12 +355,13 @@ def print_debug(msg):
         print(f'DEBUG: {msg}')
 
 
-def display_Weather(weather, zipinfo, units=IMPERIAL):
+def display_Weather(weather, zipinfo, units=None):
     """driver for weather display
 
     Args:
         weather (dict): weather data
         zipinfo (dict): location data
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -424,12 +440,13 @@ def format_title(key):
     return f' {key.title()}:'
 
 
-def print_humidity(key, value, units=IMPERIAL):
+def print_humidity(key, value, units=None):
     """Prepare and display humidity info
 
     Args:
         key (string): description of data
         value (float): percentage of humidity
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -438,38 +455,41 @@ def print_humidity(key, value, units=IMPERIAL):
     print(f'{key:<{LJUST}}{value:>{RJUST}}%')
 
 
-def print_sea_level(key, value, units=IMPERIAL):
+def print_sea_level(key, value, units=None):
     """Prepare and display pressure info
 
     Args:
         key (string): description of data
         value (float): pressure data in HPA
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
     """
-    print_pressure('Sea Level', value, units=IMPERIAL)
+    print_pressure('Sea Level', value, units)
 
 
-def print_grnd_level(key, value, units=IMPERIAL):
+def print_grnd_level(key, value, units=None):
     """Prepare and display pressure info
 
     Args:
         key (string): description of data
         value (float): pressure data in HPA
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
     """
-    print_pressure('Ground Level', value, units=IMPERIAL)
+    print_pressure('Ground Level', value, units)
 
 
-def print_pressure(key, value, units=IMPERIAL):
+def print_pressure(key, value, units=None):
     """Prepare and display pressure info
 
     Args:
         key (string): description of data
         value (float): pressure data in HPA
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -485,12 +505,13 @@ def print_pressure(key, value, units=IMPERIAL):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_temp(key, value, units=IMPERIAL):
+def print_temp(key, value, units=None):
     """Prepare and display various temp info
 
     Args:
         key (string): description of data
         value (float): temp
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -500,12 +521,13 @@ def print_temp(key, value, units=IMPERIAL):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_feels_like(key, value, units=IMPERIAL):
+def print_feels_like(key, value, units=None):
     """Prepare feels like temp info
 
     Args:
         key (string): description of data
         value (float): feels like temp
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -513,12 +535,13 @@ def print_feels_like(key, value, units=IMPERIAL):
     print_temp('Feels Like', value, units)
 
 
-def print_temp_max(key, value, units=IMPERIAL):
+def print_temp_max(key, value, units=None):
     """Prepare high temp info
 
     Args:
         key (string): description of data
         value (float): high temp
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -526,12 +549,13 @@ def print_temp_max(key, value, units=IMPERIAL):
     print_temp('High', value, units)
 
 
-def print_temp_min(key, value, units=IMPERIAL):
+def print_temp_min(key, value, units=None):
     """Prepare low temp info
 
     Args:
         key (string): description of data
         value (float): low temp
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -539,12 +563,13 @@ def print_temp_min(key, value, units=IMPERIAL):
     print_temp('Low', value, units)
 
 
-def print_visibility(key, value, units=IMPERIAL):
+def print_visibility(key, value, units=None):
     """Prepare and display visibility info
 
     Args:
         key (string): description of data
         value (float): visibility in meters
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -560,12 +585,13 @@ def print_visibility(key, value, units=IMPERIAL):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_wind(key, value, units=IMPERIAL):
+def print_wind(key, value, units=None):
     """Prepare and display wind info
 
     Args:
         key (string): description of data
         value (dict): wind speed and direction
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -588,12 +614,13 @@ def print_wind(key, value, units=IMPERIAL):
         print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
 
-def print_clouds(key, value, units=IMPERIAL):
+def print_clouds(key, value, units=None):
     """Prepare and display cloud info
 
     Args:
         key (string): description of data
         value (int): percentage of cloud coverage
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -603,12 +630,13 @@ def print_clouds(key, value, units=IMPERIAL):
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_snow_rain(key, value, units=IMPERIAL):
+def print_snow_rain(key, value, units=None):
     """Prepare and display snow/rain info
 
     Args:
         key (string): description of data
         value (list): how much snow/rain 1h and 3h
+        units (string): imperial, metric, standard/kelvin
 
     Returns:
         Nothing
@@ -624,12 +652,13 @@ def print_snow_rain(key, value, units=IMPERIAL):
         print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
-def print_sys(key, value, units=IMPERIAL):
+def print_sys(key, value, units=None):
     """Driver/Prepare display of the sunrise/sunset
 
     Args:
         key (string): description of data
         value (datetime): date/time
+        units (string): imperial, metric, standard/kelvin
 
     Returns:j
         Nothing

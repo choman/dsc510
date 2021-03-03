@@ -40,6 +40,9 @@ class TestWindDirection(unittest.TestCase):
         expected_string = f" {test_string.title()}:"
         self.assertEqual(weather.format_title(test_string), expected_string)
 
+    def test_city_state(self):
+        self.assertEqual(weather.requestWeatherLocation("Omaha, NE"), "omaha, ne")
+
     def validate_zip_by_api(self):
         try:
             import uszipcode
