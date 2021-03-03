@@ -63,8 +63,10 @@
 import json
 import random
 import requests
+import string
 import sys
 import time
+import urllib
 
 try:
     import uszipcode
@@ -167,6 +169,15 @@ WIND_DIRS = [
     'W', 'WNW', 'NW', 'NNW'
 ]
 
+SPECIAL_CITIES = {
+    "wilkes-barre, pa": "wilkes barre, pa",
+    "fuquay-varina, nc": "fuquay varina, nc",
+    "sedro-woolley, wa": "sedro woolley, wa",
+    "dover-foxcroft, me": "dover foxcroft, me",
+    "o'fallon, il": "o fallon, il",
+
+}
+
 # cardinal direction arrows in unicode
 if USE_ARROWS:
     WIND_ARROWS = [
@@ -187,7 +198,7 @@ def main():
 
 def welcome():
     print()
-    print("Welcome for Chad's Weather Machine!")
+    print("Welcome to Chad's Weather Machine!")
     print()
     print('Follow the directions')
     print('   - All output is in imperial format')
@@ -231,12 +242,43 @@ def requestWeatherLocation():
     Returns:
         location (string): location city/state || zip
     """
-    print()
-    print()
-    location = input('Enter location (<zip> or <city, state>): ').strip()
+    warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
 
-    if not len(location) or location.lower() in QUIT:
-        sys.exit()
+    print()
+    while True:
+        print()
+        location = input('Enter location (<zip> or <city, state>): ').strip()
+
+        if not len(location) or location.lower() in QUIT:
+            sys.exit()
+
+        if location.isdigit() and len(location) == 5:
+            break
+
+        elif ',' not in location:
+            print(warn_msg)
+            continue
+
+        elif not set(location).difference(string.ascii_letters +
+                                          string.whitespace + 
+                                          ',-\'.'):
+
+            if not USE_USZIPCODE:
+                location = location.lower()
+
+                if location in SPECIAL_CITIES:
+                    location = SPECIAL_CITIES[location]
+
+                if location.startswith("st."):
+                    location = location.replace("st.", "saint")
+
+                if location.startswith("st"):
+                    location = location.replace("st", "saint")
+
+                break
+
+        else:
+            print(warn_msg)
 
     return location
 
@@ -454,7 +496,7 @@ def print_temp(key, value, units=IMPERIAL):
         Nothing
     """
     key = format_title(key)
-    value = f'{value}{DEGREES[units]}'
+    value = f'{value:.1f}{DEGREES[units]}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
@@ -708,38 +750,31 @@ def verifyLocationByURL(loc):
     }
 
     if loc.isdigit() and len(loc) == 5:
-        zipinfo = loc
         params = (
             ('codes', f'{loc}'),
             ('country', 'us'),
         )
 
-        zipinfo = getInfo(ZIPCODE_CODE, headers=headers, params=params)
 
-        if not len(zipinfo['results']):
-            zipinfo = None
-
-        else:
-            zipinfo = normalize_zipinfo(zipinfo=zipinfo)
+        url = ZIPCODE_CODE
 
     elif ',' in loc:
         city, state = getCityState(loc)
 
-        zipinfo = f'{city},{state}'
         params = (
             ('city', f'{city.title()}'),
             ('state_name', f'{STATES.get(state.upper(), None)}'),
             ('country', 'us'.upper()),
         )
 
-        zipinfo = getInfo(ZIPCODE_CITY, headers=headers, params=params)
+        url = ZIPCODE_CITY
+    
+    zipinfo = getInfo(url, headers=headers, params=params)
 
-        if not len(zipinfo['results']):
-            zipinfo = None
+    if not len(zipinfo['results']):
+        return None
 
-        else:
-            zipinfo = normalize_zipinfo(zipinfo=zipinfo)
-
+    zipinfo = normalize_zipinfo(zipinfo=zipinfo)
     return zipinfo
 
 
