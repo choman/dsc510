@@ -535,10 +535,10 @@ def print_wind(key, value, units=IMPERIAL):
 
         else:
             key = format_title(f'Wind {k}')
+            tag = 'mph'
+
             if METRIC in units:
                 tag = 'm/s'
-            else:
-                tag = 'mph'
 
             svalue = f'{value[k]}{tag}'
 
@@ -606,9 +606,6 @@ def print_riseset(title, value):
         Nothing
     """
     key = format_title(title)
-
-#    date = datetime.datetime.fromtimestamp(value)
-
     gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
     lvalue = time.strftime('%H:%M %Z', time.localtime(value))
 
@@ -629,6 +626,7 @@ def verifyLocation(loc, search=None):
 
     if search is None:
         zipinfo = verifyLocationByURL(loc)
+
     else:
         zipinfo = verifyLocationByAPI(loc, search)
 
@@ -695,10 +693,9 @@ def getWindDirection(degree):
     ix = round(degree / (360 / len(WIND_DIRS)))
     idx = ix % len(WIND_DIRS)
 
+    result = f'{WIND_DIRS[idx]}'
     if USE_ARROWS:
         result = f'{WIND_DIRS[idx]} {WIND_ARROWS[idx]}'
-    else:
-        result = f'{WIND_DIRS[idx]}'
 
     return result
 
@@ -744,8 +741,10 @@ def verifyLocationByURL(loc):
         )
 
         zipinfo = getInfo(ZIPCODE_CITY, headers=headers, params=params)
+
         if not len(zipinfo['results']):
             zipinfo = None
+
         else:
             zipinfo = normalize_zipinfo(zipinfo=zipinfo)
 
