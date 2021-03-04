@@ -41,6 +41,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-03-04        Resolved issue in STATES dict
+#                                   Formed STATES_REV for faster lookups
 #  Chad Homan     2021-03-02        Implemented a template for docstrings
 #                                   Corrected hPa math to X in water
 #                                   added logic for metric and standard
@@ -161,6 +163,8 @@ STATES = {
     'WV': 'West Virginia',
     'WY': 'Wyoming'
 }
+
+STATES_REV = {v: k for k, v in STATES.items()}
 
 WIND_DIRS = [
     'N', 'NNE', 'NE', 'ENE',
@@ -872,10 +876,10 @@ def getStateAbbreviation(state):
     Returns:
         string: abbreviated state name
     """
-    for key, value in STATES.items():
-        if value.lower() == state.lower():
-            return key.capitalize()
+    if state in STATES_REV:
+        return STATES_REV[state].capitalize()
 
+    return state.capitalize()
 
 def getInfo(url, headers=None, params=None):
     """ Primary Url connector - uses the requests
