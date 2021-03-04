@@ -388,7 +388,7 @@ def display_Weather(weather, zipinfo, units=None):
         'rain':       print_snow_rain,
     }
 
-    wheader = (
+    weather_header = (
       f"Current weather in {zipinfo['city']}, "
       f"{zipinfo['state']} {zipinfo['zipcode']} "
       f"({weather['coord']['lon']}/{weather['coord']['lat']}):\n"
@@ -410,7 +410,7 @@ def display_Weather(weather, zipinfo, units=None):
     print_debug(weather['main'])
 
     print()
-    print(wheader)
+    print(weather_header)
     process_items(temps)
     print()
     print_desc(weather)
