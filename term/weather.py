@@ -202,14 +202,14 @@ def main():
 
 def welcome():
     print()
-    print("Welcome to Chad's Weather Machine!")
+    print("Welcome to Chad's Bizarre Weather Machine!")
     print()
-    print('Follow the directions')
-    print('   - All output is in imperial format')
-    print('   - if Celsius is chosen, output is in metric')
-    print('   - if Kelvin is chosen, only temps are in Kelvin')
+    print('Follow the directions:')
+    print('   - Default output is in imperial format')
+    print('   - If Celsius is chosen, output is in metric')
+    print('   - If Kelvin is chosen, only temps are in Kelvin')
     print()
-    print('To exit, press <enter> on a line by itself to leave')
+    print('To exit, press <enter> on a line by itself')
 
 
 # function: getLocation()
@@ -884,9 +884,9 @@ def getStateAbbreviation(state):
         string: abbreviated state name
     """
     if state in STATES_REV:
-        return STATES_REV[state].capitalize()
+        return STATES_REV[state].upper()
 
-    return state.capitalize()
+    return state.upper()
 
 
 def getInfo(url, headers=None, params=None):
