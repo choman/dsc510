@@ -41,6 +41,8 @@
 # Record Of Modifications
 #    Author         Date            Description
 #  ----------    ------------       ----------------------------------
+#  Chad Homan     2021-03-05        added param to th request functions
+#                                     to assist with unittest
 #  Chad Homan     2021-03-04        Resolved issue in STATES dict
 #                                   Formed STATES_REV for faster lookups
 #                                   translation for cities like st louis
@@ -73,7 +75,7 @@ import urllib
 
 try:
     import uszipcode
-    USE_USZIPCODE = False
+    USE_USZIPCODE = True
 
 except ModuleNotFoundError:
     USE_USZIPCODE = False
