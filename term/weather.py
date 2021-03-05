@@ -192,14 +192,6 @@ WIND_DIRS = [
     'W', 'WNW', 'NW', 'NNW'
 ]
 
-SPECIAL_CITIES = {
-    "wilkes-barre, pa": "wilkes barre, pa",
-    "fuquay-varina, nc": "fuquay varina, nc",
-    "sedro-woolley, wa": "sedro woolley, wa",
-    "dover-foxcroft, me": "dover foxcroft, me",
-    "o'fallon, il": "o fallon, il",
-}
-
 # cardinal direction arrows in unicode
 if USE_ARROWS:
     WIND_ARROWS = [
@@ -209,6 +201,13 @@ if USE_ARROWS:
         '\u2192', '\u2198', '\u2198', '\u2198'
     ]
 
+SPECIAL_CITIES = {
+    "wilkes-barre, pa": "wilkes barre, pa",
+    "fuquay-varina, nc": "fuquay varina, nc",
+    "sedro-woolley, wa": "sedro woolley, wa",
+    "dover-foxcroft, me": "dover foxcroft, me",
+    "o'fallon, il": "o fallon, il",
+}
 
 # function: main()
 # abstract: Main program
