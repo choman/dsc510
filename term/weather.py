@@ -72,10 +72,9 @@ import urllib
 
 try:
     import uszipcode
-    USE_USZIPCODE = True
+    USE_USZIPCODE = False
 
 except ModuleNotFoundError:
-    print('Proceeding w/o uszipcode module')
     USE_USZIPCODE = False
 
 USE_ARROWS   = True
@@ -605,7 +604,7 @@ def print_wind(key, value, units=None):
         if 'deg' in k:
             key = format_title('Wind direction')
             cardinal_direction = getWindDirection(value['deg'])
-            svalue = f"{cardinal_direction} - {value['deg']}{DEGREE}"
+            svalue = f"{cardinal_direction} // {value['deg']}{DEGREE}"
 
         else:
             key = format_title(f'Wind {k}')
@@ -880,6 +879,7 @@ def getStateAbbreviation(state):
         return STATES_REV[state].capitalize()
 
     return state.capitalize()
+
 
 def getInfo(url, headers=None, params=None):
     """ Primary Url connector - uses the requests
