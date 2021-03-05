@@ -65,7 +65,7 @@ class TestWindDirection(unittest.TestCase):
 
     def test_get_state_abbreviation(self):
         for k, v in weather.STATES.items():
-            self.assertEqual(weather.getStateAbbreviation(v), k.capitalize())
+            self.assertEqual(weather.getStateAbbreviation(v), k.upper())
 
     def test_get_city_state(self):
         self.assertEqual(weather.getCityState("Omaha, NE"), ("Omaha", "Ne"))
