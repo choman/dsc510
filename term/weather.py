@@ -96,6 +96,7 @@ ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 IMPERIAL     = 'imperial'  # fahrenhite
 METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
+SEPTAG       = '|'
 
 DEGREES = {
    IMPERIAL: f'{DEGREE}F',
@@ -206,7 +207,7 @@ def welcome():
     print('Follow the directions')
     print('   - All output is in imperial format')
     print('   - if Celsius is chosen, output is in metric')
-    print('   - if Kelvin is chosen, temps only are in Kelvin')
+    print('   - if Kelvin is chosen, only temps are in Kelvin')
     print()
     print('To exit, press <enter> on a line by itself to leave')
 
@@ -267,7 +268,7 @@ def requestWeatherLocation():
                                           ',-\'.'):
 
             if not USE_USZIPCODE:
-                location = sanatizeForURL(location)
+                location = sanitizeForURL(location)
 
             break
 
@@ -277,15 +278,22 @@ def requestWeatherLocation():
     return location
 
 
-def sanatizeForURL(location):
-    """sanatizes city/state for zipcode URL
+def sanitizeForURL(location):
+    """sanitizes city/state for zipcode URL
 
     Args:
         location (string): city, state
 
     Returns:
-        location (string): sanatized citym state
+        location (string): sanitized city and state
     """
+    city, state = getCityState(location)
+
+    if state in STATES_REV:
+        state = STATES_REV[state]
+
+    location = f"{city}, {state}"
+
     location = location.lower()
 
     if location in SPECIAL_CITIES:
@@ -507,7 +515,7 @@ def print_pressure(key, value, units=None):
         cvalue = value * HPA2INCH
         tag = 'in'
 
-    value = f'{value}hPa // {cvalue:.2f}{tag}'
+    value = f'{value}hPa {SEPTAG} {cvalue:.2f}{tag}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
 
 
@@ -604,7 +612,7 @@ def print_wind(key, value, units=None):
         if 'deg' in k:
             key = format_title('Wind direction')
             cardinal_direction = getWindDirection(value['deg'])
-            svalue = f"{cardinal_direction} // {value['deg']}{DEGREE}"
+            svalue = f"{cardinal_direction} {SEPTAG} {value['deg']}{DEGREE}"
 
         else:
             key = format_title(f'Wind {k}')
@@ -684,7 +692,7 @@ def print_riseset(title, value):
     gvalue = time.strftime('%H:%M %Z', time.gmtime(value))
     lvalue = time.strftime('%H:%M %Z', time.localtime(value))
 
-    print(f'{key:<{LJUST}}{lvalue} // {gvalue:>{RJUST}}')
+    print(f'{key:<{LJUST}}{lvalue} {SEPTAG} {gvalue:>{RJUST}}')
 
 
 def verifyLocation(loc, search=None):
