@@ -44,6 +44,7 @@
 #  Chad Homan     2021-03-05        added param to th request functions
 #                                     to assist with unittest
 #                                   added '!!' to repeat last entry
+#                                   added history
 #  Chad Homan     2021-03-04        Resolved issue in STATES dict
 #                                   Formed STATES_REV for faster lookups
 #                                   translation for cities like st louis
@@ -83,6 +84,7 @@ except ModuleNotFoundError:
 
 USE_ARROWS   = True
 QUIT         = 'q'
+DONE         = 'done'
 DEGREE       = chr(176)
 HPA2INCH     = .401463
 HPA2CM       = 1.01972
@@ -97,13 +99,23 @@ ZIPCODE_CODE = 'https://app.zipcodebase.com/api/v1/search'
 ZIPCODE_CITY = 'https://app.zipcodebase.com/api/v1/code/city'
 ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 
+MAX_HISTORY  = 10
+HISTORY      = 'history'
 IMPERIAL     = 'imperial'  # fahrenhite
 METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
 SEPTAG       = '|'
 REPEAT_ENTRY = '!!'
+TEST_HISTORY =  False
 
-LAST_ENTRY   = {'entry': None}
+LAST_ENTRIES = {
+    'entry': None,
+    HISTORY: [],
+    }
+
+if TEST_HISTORY:
+    LAST_ENTRIES[HISTORY] = ["68046", "68047", "68057", "dallas, tx", "90210",
+                        "miami, fl", "omaha,ne", "bellevue, ne"]
 
 DEGREES = {
    IMPERIAL: f'{DEGREE}F',
@@ -216,9 +228,10 @@ def welcome():
     print('   - If Kelvin is chosen, only temps are in Kelvin')
     print()
     print('Hints:')
-    print(f'    {REPEAT_ENTRY} - Repeat last <zip> or <city, state>')
+    print(f'    {REPEAT_ENTRY:15} - Repeat last <zip> or <city, state>')
+    print(f'    hist/{HISTORY:10} - Selection from last {MAX_HISTORY} entries')
     print()
-    print('To exit, press <enter> on a line by itself')
+    print(f"To Exit: Enter '{QUIT}' or '{DONE}'")
 
 
 # function: getLocation()
@@ -265,11 +278,20 @@ def requestWeatherLocation(location=None):
         if location is None:
             location = input(query_str).strip()
 
-        if LAST_ENTRY['entry'] and location == REPEAT_ENTRY:
-            location = LAST_ENTRY['entry']
+        if not len(location):
+            location = None
+            continue
 
-        if not len(location) or location.lower() in QUIT:
+        if location.lower() in QUIT or location.lower() in DONE:
             sys.exit()
+
+        location = check_history(location)
+        if location is None:
+            continue
+
+        if LAST_ENTRIES['entry'] and location == REPEAT_ENTRY:
+            location = LAST_ENTRIES['entry']
+
 
         if location.isdigit() and len(location) == 5:
             break
@@ -291,8 +313,96 @@ def requestWeatherLocation(location=None):
         else:
             print(warn_msg)
 
-    LAST_ENTRY['entry'] = location
+    LAST_ENTRIES['entry'] = location
+    LAST_ENTRIES[HISTORY].insert(0, location)
+    print_debug(LAST_ENTRIES)
     return location
+
+
+def check_history(location):
+
+    odd = False
+
+    if not LAST_ENTRIES[HISTORY]:
+        print("No history available")
+
+        if location == HISTORY:
+            return None
+
+        return location
+
+    if location.lower() == 'hist' or location.lower() == HISTORY:
+        tmp  = list(LAST_ENTRIES[HISTORY])
+
+        if len(tmp) >= MAX_HISTORY:
+            tmp = tmp[:MAX_HISTORY]
+
+        tmp1 = []
+        tmp2 = []
+
+        if len(tmp) > 5:
+            half = len(tmp) // 2
+            if len(tmp) % 2 == 0:
+                print("even")
+                tmp1 = tmp[:half]
+                tmp2 = tmp[half:]
+
+            else:
+                print_debug("odd")
+                odd = True
+                tmp1 = tmp[:half + 1]
+                tmp2 = tmp[half + 1:]
+
+            print_debug(f"tmp1 = {tmp1}")
+            print_debug(f"tmp2 = {tmp2}")
+        else:
+            tmp1 = tmp
+
+        other = len(tmp1) 
+        for count, item in enumerate(tmp1, start=1):
+            if count - 1 == MAX_HISTORY:
+                break
+
+            if len(tmp2):
+                if odd and count - 1 >= len(tmp2):
+                   print(f"{count}: {item:20}")
+
+                else:
+                   print(f"{count}: {item:20} {count + other}: {tmp2[count - 1]}")
+
+            else:
+                print(f"{count}: {item}")
+
+        print()
+
+        while True:
+            selection = input("Please select or <enter> to return: ")
+
+            if testInt(selection):
+                selection = int(selection)
+
+                if len(str(selection)) == 5:
+                    return str(selection) or None
+
+                if selection > len(LAST_ENTRIES[HISTORY]):
+                    continue
+
+                return LAST_ENTRIES[HISTORY][selection - 1]
+
+            else:
+                return selection or None
+
+    else:
+        return location
+
+
+def testInt(value):
+    try:
+        float(value)
+    except ValueError:
+        return False
+    else:
+        return float(value).is_integer()
 
 
 def sanitizeForURL(location):
