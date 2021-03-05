@@ -509,11 +509,11 @@ def print_pressure(key, value, units=None):
 
     if METRIC in units:
         cvalue = value * HPA2CM
-        tag = 'cm'
+        tag = 'cmH2O'
 
     else:
         cvalue = value * HPA2INCH
-        tag = 'in'
+        tag = 'inH2O'
 
     value = f'{value}hPa {SEPTAG} {cvalue:.2f}{tag}'
     print(f'{key:<{LJUST}}{value:>{RJUST}}')
