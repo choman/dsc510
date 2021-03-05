@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import mock
+import string
+import sys
 import unittest
 import weather
+#import while_loop
+
+from io import StringIO
 
 
 class TestWindDirection(unittest.TestCase):
@@ -30,6 +36,8 @@ class TestWindDirection(unittest.TestCase):
         self.assertEqual(weather.getWindDirection(292.5).split()[0], "WNW")
         self.assertEqual(weather.getWindDirection(337.5).split()[0], "NNW")
 
+class TestOtherFunctions(unittest.TestCase):
+
     def test_format_single_word_title(self):
         test_string = "wind"
         expected_string = f" {test_string.title()}:"
@@ -40,8 +48,6 @@ class TestWindDirection(unittest.TestCase):
         expected_string = f" {test_string.title()}:"
         self.assertEqual(weather.format_title(test_string), expected_string)
 
-    def test_city_state(self):
-        self.assertEqual(weather.requestWeatherLocation("Omaha, NE"), "omaha, ne")
 
     def validate_zip_by_api(self):
         try:
@@ -70,7 +76,53 @@ class TestWindDirection(unittest.TestCase):
     def test_get_city_state(self):
         self.assertEqual(weather.getCityState("Omaha, NE"), ("Omaha", "Ne"))
         self.assertEqual(weather.getCityState("Omaha, NE, US"), ("Omaha", "Ne"))
+        
+    def test_translate(self):
+        test_cities = {
+            "st. louis, mo": 'saint louis, mo',
+            "st louis, mo": 'saint louis, mo',
+            "mt. vernon, va": 'mount vernon, va',
+            "ft. calhoun, ne": 'fort calhoun, ne',
+            "ft calhoun, ne": 'fort calhoun, ne',
+        }
+        for k, v in test_cities.items():
+            self.assertEqual(weather.translate(k), v)
 
+    def test_request_weather_type(self):
+        values = {
+            'k': 'standard',
+            'c': 'metric',
+            'f': 'imperial',
+        }
+
+        for k, v in values.items():
+            self.assertEqual(weather.requestWeatherType(k), v)
+            self.assertEqual(weather.requestWeatherType(k.upper()), v)
+
+    def test_BAD_request_weather_type(self):
+        for i in string.ascii_lowercase:
+            if i in ['k', 'c', 'f']:
+                continue
+
+            self.assertEqual(weather.requestWeatherType(i), 'imperial')
+            self.assertEqual(weather.requestWeatherType(i.upper()), 'imperial')
+
+        for i in string.digits:
+            self.assertEqual(weather.requestWeatherType(i), 'imperial')
+
+        for i in string.punctuation:
+            self.assertEqual(weather.requestWeatherType(i), 'imperial')
+
+class TestWhileLoop(unittest.TestCase):
+
+    def test_city_state(self):
+        judge = mock.Mock(side_effect=[1,0])
+
+        out = StringIO()
+        sys.stdout = out
+        print (weather.requestWeatherLocation("Omaha, NE"))
+
+        self.assertEqual(weather.requestWeatherLocation("Omaha, NE"), "omaha, ne")
 
 if __name__ == "__main__":
     unittest.main()

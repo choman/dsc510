@@ -241,18 +241,21 @@ def getLocation():
     print_debug(f'location = {location}')
 
 
-def requestWeatherLocation():
+def requestWeatherLocation(location=None):
     """Get weather location
 
     Returns:
         location (string): location city/state || zip
     """
     warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
+    query_str = 'Enter location (<zip> or <city, state>): '
 
     print()
     while True:
         print()
-        location = input('Enter location (<zip> or <city, state>): ').strip()
+
+        if location is None:
+            location = input(query_str).strip()
 
         if not len(location) or location.lower() in QUIT:
             sys.exit()
@@ -331,15 +334,16 @@ def translate(location):
     return location
 
 
-def requestWeatherType():
+def requestWeatherType(view=None):
     """get weather type (imperial, metric, kelvin/standard)
 
     Returns:
         units (string): weather type
     """
-    print()
-    print('How would you like to view the weather?')
-    view = input('(F)ahrenheit, (C)elsius, (K)elvin [F]: ').strip()
+    if view is None:
+        print()
+        print('How would you like to view the weather?')
+        view = input('(F)ahrenheit, (C)elsius, (K)elvin [F]: ').strip()
 
     if 'k' in view.lower():
         units = STANDARD
