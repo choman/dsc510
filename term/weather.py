@@ -43,6 +43,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-03-05        added param to th request functions
 #                                     to assist with unittest
+#                                   added '!!' to repeat last entry
 #  Chad Homan     2021-03-04        Resolved issue in STATES dict
 #                                   Formed STATES_REV for faster lookups
 #                                   translation for cities like st louis
@@ -100,6 +101,9 @@ IMPERIAL     = 'imperial'  # fahrenhite
 METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
 SEPTAG       = '|'
+REPEAT_ENTRY = '!!'
+
+LAST_ENTRY   = {'entry': None}
 
 DEGREES = {
    IMPERIAL: f'{DEGREE}F',
@@ -182,7 +186,6 @@ SPECIAL_CITIES = {
     "sedro-woolley, wa": "sedro woolley, wa",
     "dover-foxcroft, me": "dover foxcroft, me",
     "o'fallon, il": "o fallon, il",
-
 }
 
 # cardinal direction arrows in unicode
@@ -211,6 +214,9 @@ def welcome():
     print('   - Default output is in imperial format')
     print('   - If Celsius is chosen, output is in metric')
     print('   - If Kelvin is chosen, only temps are in Kelvin')
+    print()
+    print('Hints:')
+    print(f'    {REPEAT_ENTRY} - Repeat last <zip> or <city, state>')
     print()
     print('To exit, press <enter> on a line by itself')
 
@@ -259,6 +265,9 @@ def requestWeatherLocation(location=None):
         if location is None:
             location = input(query_str).strip()
 
+        if LAST_ENTRY['entry'] and location == REPEAT_ENTRY:
+            location = LAST_ENTRY['entry']
+
         if not len(location) or location.lower() in QUIT:
             sys.exit()
 
@@ -267,6 +276,7 @@ def requestWeatherLocation(location=None):
 
         elif ',' not in location:
             print(warn_msg)
+            location = None
             continue
 
         elif not set(location).difference(string.ascii_letters +
@@ -281,6 +291,7 @@ def requestWeatherLocation(location=None):
         else:
             print(warn_msg)
 
+    LAST_ENTRY['entry'] = location
     return location
 
 
