@@ -43,6 +43,7 @@
 #  ----------    ------------       ----------------------------------
 #  Chad Homan     2021-03-04        Resolved issue in STATES dict
 #                                   Formed STATES_REV for faster lookups
+#                                   translation for cities like st louis
 #  Chad Homan     2021-03-02        Implemented a template for docstrings
 #                                   Corrected hPa math to X in water
 #                                   added logic for metric and standard
@@ -299,11 +300,33 @@ def sanitizeForURL(location):
     if location in SPECIAL_CITIES:
         location = SPECIAL_CITIES[location]
 
-    if location.startswith("st."):
-        location = location.replace("st.", "saint")
+    location = translate(location)
 
-    if location.startswith("st"):
-        location = location.replace("st", "saint")
+    return location
+
+
+def translate(location):
+    """get weather type (imperial, metric, kelvin/standard)
+
+    Args:
+        location (string): city, state
+    Returns:
+        location (string): city, state
+    """
+    translations = {
+        "st.":  "saint",
+        "st":   "saint",
+        "ft.":  "fort",
+        "ft":   "fort",
+        "mt.":  "mount",
+        "mt":   "mount",
+        "ste.": "sainte",
+        "ste":  "sainte",
+    }
+
+    for prefix, word in translations.items():
+        if f'{prefix} ' in location or f' {prefix} ' in location:
+            location = location.replace(prefix, word)
 
     return location
 
