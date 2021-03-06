@@ -74,8 +74,8 @@ class TestOtherFunctions(unittest.TestCase):
             self.assertEqual(weather.getStateAbbreviation(v), k.upper())
 
     def test_get_city_state(self):
-        self.assertEqual(weather.getCityState("Omaha, NE"), ("Omaha", "Ne"))
-        self.assertEqual(weather.getCityState("Omaha, NE, US"), ("Omaha", "Ne"))
+        self.assertEqual(weather.getCityState("Omaha, NE"), ("Omaha", "NE"))
+        self.assertEqual(weather.getCityState("Omaha, NE, US"), ("Omaha", "NE"))
         
     def test_translate(self):
         test_cities = {

@@ -288,6 +288,7 @@ def requestWeatherLocation(location=None):
     """
     warn_msg = f'WARNING: Please enter valid {VALUES}'
     query_str = f'Enter location ({VALUES}): '
+    loc = None
 
     print()
     while True:
@@ -336,10 +337,9 @@ def requestWeatherLocation(location=None):
         else:
             print(warn_msg)
 
-    if loc.lower() != location:
+    if loc is not None and loc.lower() != location:
         loc = location
-
-    update_last_entries(loc)
+        update_last_entries(loc)
 
     return location
 
