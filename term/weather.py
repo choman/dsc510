@@ -185,21 +185,21 @@ STATES = {
 
 STATES_REV = {v: k for k, v in STATES.items()}
 
-WIND_DIRS = [
+WIND_DIRS = (
     'N', 'NNE', 'NE', 'ENE',
     'E', 'ESE', 'SE', 'SSE',
     'S', 'SSW', 'SW', 'WSW',
     'W', 'WNW', 'NW', 'NNW'
-]
+)
 
 # cardinal direction arrows in unicode
 if USE_ARROWS:
-    WIND_ARROWS = [
+    WIND_ARROWS = (
         '\u2193', '\u2199', '\u2199', '\u2199',
         '\u2190', '\u2196', '\u2196', '\u2196',
         '\u2191', '\u2197', '\u2197', '\u2197',
         '\u2192', '\u2198', '\u2198', '\u2198'
-    ]
+    )
 
 SPECIAL_CITIES = {
     "wilkes-barre, pa": "wilkes barre, pa",
@@ -323,9 +323,9 @@ def check_history(location):
     odd = False
 
     if not LAST_ENTRIES[HISTORY]:
-        print("No history available")
 
         if location == HISTORY:
+            print("No history available!")
             return None
 
         return location
@@ -448,6 +448,9 @@ def translate(location):
         "ste.": "sainte",
         "ste":  "sainte",
     }
+    ignore = ("st comlumbus")
+    if location.startswith(ignore):
+        return location
 
     for prefix, word in translations.items():
         if f'{prefix} ' in location or f' {prefix} ' in location:
