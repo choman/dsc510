@@ -102,12 +102,14 @@ ZIPCODE_KEY  = '823b29f0-6fb2-11eb-af5d-b780351b2eba'
 
 MAX_HISTORY  = 10
 HISTORY      = 'history'
+HIST         = 'hist'
 IMPERIAL     = 'imperial'  # fahrenhite
 METRIC       = 'metric'    # celcius
 STANDARD     = 'standard'  # kelvin
 SEPTAG       = '|'
 REPEAT_ENTRY = '!!'
 TEST_HISTORY =  False
+VALUES       = '<zipcode> or <city, state> or <cmd>'
 
 LAST_ENTRIES = {
     'entry': None,
@@ -236,15 +238,13 @@ def help():
     Args: None
     Returns: Nothing
     """
-    shistory = 'hist'
-
     print('Commands:')
-    print(f'    {REPEAT_ENTRY:10} - Repeat last <zip> or <city, state>')
-    print(f'    {HISTORY:10} - Selection from last {MAX_HISTORY} entries')
-    print(f'    {shistory:10} - Selection from last {MAX_HISTORY} entries')
-    print(f'    {HELP:10} - Access help')
-    print(f'    {DONE:10} - Exit Program')
-    print(f'    {QUIT:10} - Exit Program')
+    print(f'  {REPEAT_ENTRY:10} - Repeat last <zip> or <city, state>')
+    print(f'  {HISTORY:10} - Select from last {MAX_HISTORY} entries')
+    print(f'  {HIST:10} - Select from last {MAX_HISTORY} entries')
+    print(f'  {HELP:10} - Access help')
+    print(f'  {DONE:10} - Exit Program')
+    print(f'  {QUIT:10} - Exit Program')
     print()
 
 
@@ -282,22 +282,18 @@ def requestWeatherLocation(location=None):
     Returns:
         location (string): location city/state || zip
     """
-    warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
-    query_str = 'Enter location (<zip> or <city, state> or <cmd>): '
+    warn_msg = f'WARNING: Please enter valid {VALUES}'
+    query_str = f'Enter location ({VALUES}): '
 
     print()
     while True:
         print()
 
         if location is None:
-            location = input(query_str).strip()
+            loc = input(query_str).strip()
+            location = loc
 
         if not len(location):
-            location = None
-            continue
-
-        if location == HELP:
-            help()
             location = None
             continue
 
@@ -308,9 +304,13 @@ def requestWeatherLocation(location=None):
         if location is None:
             continue
 
+        if location.lower() == HELP:
+            help()
+            location = None
+            continue
+
         if LAST_ENTRIES['entry'] and location == REPEAT_ENTRY:
             location = LAST_ENTRIES['entry']
-
 
         if location.isdigit() and len(location) == 5:
             break
@@ -332,25 +332,30 @@ def requestWeatherLocation(location=None):
         else:
             print(warn_msg)
 
-    LAST_ENTRIES['entry'] = location
-    LAST_ENTRIES[HISTORY].insert(0, location)
+    if loc.lower() != location:
+        loc = location
+
+    LAST_ENTRIES['entry'] = loc
+    LAST_ENTRIES[HISTORY].insert(0, loc)
     print_debug(LAST_ENTRIES)
+
     return location
 
 
 def check_history(location):
 
     odd = False
+    loc = location.lower()
 
     if not LAST_ENTRIES[HISTORY]:
 
-        if location == HISTORY:
+        if loc == HIST or loc == HISTORY:
             print("No history available!")
             return None
 
         return location
 
-    if location.lower() == 'hist' or location.lower() == HISTORY:
+    if loc == HIST or loc == HISTORY:
         tmp  = list(LAST_ENTRIES[HISTORY])
 
         if len(tmp) >= MAX_HISTORY:
@@ -877,7 +882,7 @@ def verifyLocation(loc, search=None):
     Returns:
         zipinfo (dict): zip data
     """
-    warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
+    warn_msg = f'WARNING: Please enter valid {VALUES}'
 
     if search is None:
         zipinfo = verifyLocationByURL(loc)
