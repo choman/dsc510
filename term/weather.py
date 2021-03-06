@@ -362,7 +362,12 @@ def update_last_entries(loc):
 
 
 def check_history(location):
-
+    """Check and display history
+    Args:
+       location (string): location
+    Return:
+        location (string): location
+    """
     odd = False
     loc = location.lower()
 
@@ -375,32 +380,7 @@ def check_history(location):
         return location
 
     if loc == HIST or loc == HISTORY:
-        tmp  = list(LAST_ENTRIES[HISTORY])
-
-        if len(tmp) >= MAX_HISTORY:
-            tmp = tmp[:MAX_HISTORY]
-
-        tmp1 = []
-        tmp2 = []
-
-        if len(tmp) > 5:
-            half = len(tmp) // 2
-            if len(tmp) % 2 == 0:
-                print("even")
-                tmp1 = tmp[:half]
-                tmp2 = tmp[half:]
-
-            else:
-                print_debug("odd")
-                odd = True
-                tmp1 = tmp[:half + 1]
-                tmp2 = tmp[half + 1:]
-
-            print_debug(f"tmp1 = {tmp1}")
-            print_debug(f"tmp2 = {tmp2}")
-        else:
-            tmp1 = tmp
-
+        tmp1, tmp2, odd = get_lists()
         display_history(tmp1, tmp2, odd)
 
         print()
@@ -425,6 +405,44 @@ def check_history(location):
     else:
         return location
 
+
+def get_lists():
+    """builds two lists
+
+    Returns:
+        tmp1 (list): list of items
+        tmp2 (list): list of items [empty if < 5 entries in tmp1]
+        odd (boolen): true or false
+    """
+    odd = False
+    tmp  = list(LAST_ENTRIES[HISTORY])
+    tmp1 = []
+    tmp2 = []
+
+    if len(tmp) >= MAX_HISTORY:
+        tmp = tmp[:MAX_HISTORY]
+
+    if len(tmp) <= 5:
+        tmp1 = tmp
+        return tmp1, tmp2, odd
+
+    half = len(tmp) // 2
+    if len(tmp) % 2 == 0:
+        print("even")
+        tmp1 = tmp[:half]
+        tmp2 = tmp[half:]
+
+    else:
+        print_debug("odd")
+        odd = True
+        tmp1 = tmp[:half + 1]
+        tmp2 = tmp[half + 1:]
+
+    print_debug(f"tmp1 = {tmp1}")
+    print_debug(f"tmp2 = {tmp2}")
+
+    
+    return tmp1, tmp2, odd
 
 def display_history(tmp1, tmp2=None, odd=False):
     """Display history menu
