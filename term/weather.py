@@ -117,8 +117,10 @@ LAST_ENTRIES = {
     }
 
 if TEST_HISTORY:
-    LAST_ENTRIES[HISTORY] = ["68046", "68047", "68057", "dallas, tx", "90210",
-                        "miami, fl", "omaha,ne", "bellevue, ne"]
+    LAST_ENTRIES[HISTORY] = [
+        "68046", "68047", "68057", "dallas, tx", "90210",
+        "miami, fl", "omaha,ne", "bellevue, ne"
+    ]
 
 DEGREES = {
    IMPERIAL: f'{DEGREE}F',
@@ -212,6 +214,7 @@ SPECIAL_CITIES = {
     "o'fallon, il": "o fallon, il",
 }
 
+
 # function: main()
 # abstract: Main program
 #
@@ -230,7 +233,7 @@ def welcome():
     print('   - If Kelvin is chosen, only temps are in Kelvin')
     print()
     help()
-    print(f"To Exit: Enter '{QUIT}' or '{DONE}'")
+    print(f"To Exit: Enter '{QUIT}'")
 
 
 def help():
@@ -240,10 +243,8 @@ def help():
     """
     print('Commands:')
     print(f'  {REPEAT_ENTRY:10} - Repeat last <zip> or <city, state>')
-    print(f'  {HISTORY:10} - Select from last {MAX_HISTORY} entries')
     print(f'  {HIST:10} - Select from last {MAX_HISTORY} entries')
     print(f'  {HELP:10} - Access help')
-    print(f'  {DONE:10} - Exit Program')
     print(f'  {QUIT:10} - Exit Program')
     print()
 
@@ -335,11 +336,29 @@ def requestWeatherLocation(location=None):
     if loc.lower() != location:
         loc = location
 
-    LAST_ENTRIES['entry'] = loc
-    LAST_ENTRIES[HISTORY].insert(0, loc)
-    print_debug(LAST_ENTRIES)
+    update_last_entries(loc)
 
     return location
+
+
+def update_last_entries(loc):
+    """update last entries dict
+    Args:
+        loc (string): location string
+    Returns:
+        Nothing
+    """
+    if len(loc) == 5:
+
+        LAST_ENTRIES['entry'] = loc
+        LAST_ENTRIES[HISTORY].insert(0, loc)
+    else:
+        loc = getCityState(loc)
+        loc = ", ".join(loc)
+        LAST_ENTRIES['entry'] =  loc
+        LAST_ENTRIES[HISTORY].insert(0, loc)
+
+    print_debug(LAST_ENTRIES)
 
 
 def check_history(location):
@@ -382,20 +401,7 @@ def check_history(location):
         else:
             tmp1 = tmp
 
-        other = len(tmp1) 
-        for count, item in enumerate(tmp1, start=1):
-            if count - 1 == MAX_HISTORY:
-                break
-
-            if len(tmp2):
-                if odd and count - 1 >= len(tmp2):
-                   print(f"{count}: {item:20}")
-
-                else:
-                   print(f"{count}: {item:20} {count + other}: {tmp2[count - 1]}")
-
-            else:
-                print(f"{count}: {item}")
+        display_history(tmp1, tmp2, odd)
 
         print()
 
@@ -418,6 +424,31 @@ def check_history(location):
 
     else:
         return location
+
+
+def display_history(tmp1, tmp2=None, odd=False):
+    """Display history menu
+    Args:
+        tmp1 (list): list of entries
+        tmp2 (list): optional list of entries
+        odd (boolen): true or false
+    Returns:
+        Nothing
+    """
+    other = len(tmp1)
+    for count, item in enumerate(tmp1, start=1):
+        if count - 1 == MAX_HISTORY:
+            break
+
+        if len(tmp2):
+            if odd and count - 1 >= len(tmp2):
+                print(f"{count}: {item:20}")
+
+            else:
+                print(f"{count}: {item:20} {count + other}: {tmp2[count - 1]}")
+
+        else:
+            print(f"{count}: {item}")
 
 
 def testInt(value):
@@ -1005,7 +1036,7 @@ def getCityState(location):
         state (string): state
     """
     city  = location.split(',')[0].strip().title()
-    state = location.split(',')[1].strip().title()
+    state = location.split(',')[1].strip().upper()
 
     return city, state
 
