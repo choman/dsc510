@@ -225,7 +225,7 @@ def main():
 
 def welcome():
     print()
-    print("Welcome to Chad's Bizarre Weather Machine!")
+    print("Welcome to Chad's Bizarre Wacky Weather Machine!")
     print()
     print('Follow the directions:')
     print('   - Default output is in imperial format')
@@ -279,6 +279,9 @@ def getLocation():
 
 def requestWeatherLocation(location=None):
     """Get weather location
+
+    Args:
+        location (string): unittest only
 
     Returns:
         location (string): location city/state || zip
@@ -349,9 +352,9 @@ def update_last_entries(loc):
         Nothing
     """
     if len(loc) == 5:
-
         LAST_ENTRIES['entry'] = loc
         LAST_ENTRIES[HISTORY].insert(0, loc)
+
     else:
         loc = getCityState(loc)
         loc = ", ".join(loc)
@@ -428,7 +431,7 @@ def get_lists():
 
     half = len(tmp) // 2
     if len(tmp) % 2 == 0:
-        print("even")
+        print_debug("even")
         tmp1 = tmp[:half]
         tmp2 = tmp[half:]
 
@@ -441,15 +444,17 @@ def get_lists():
     print_debug(f"tmp1 = {tmp1}")
     print_debug(f"tmp2 = {tmp2}")
 
-    
     return tmp1, tmp2, odd
+
 
 def display_history(tmp1, tmp2=None, odd=False):
     """Display history menu
+
     Args:
         tmp1 (list): list of entries
         tmp2 (list): optional list of entries
         odd (boolen): true or false
+
     Returns:
         Nothing
     """
@@ -470,6 +475,14 @@ def display_history(tmp1, tmp2=None, odd=False):
 
 
 def testInt(value):
+    """test if value is int
+
+    Args:
+        value (data): value to test if int
+
+    Returns:
+        boolean: true or false
+    """
     try:
         float(value)
     except ValueError:
@@ -634,9 +647,9 @@ def display_Weather(weather, zipinfo, units=None):
         Returns: nothing
         """
         print_debug(data)
-        for k, v in data.items():
-            if k in print_calls:
-                print_calls[k](k, v, units)
+        for key, value in data.items():
+            if key in print_calls:
+                print_calls[key](key, value, units)
 
     print_debug(weather)
     print_debug(weather['weather'])
@@ -834,20 +847,20 @@ def print_wind(key, value, units=None):
     Returns:
         Nothing
     """
-    for k, v in value.items():
-        if 'deg' in k:
+    for key_thing, val in value.items():
+        if 'deg' in key_thing:
             key = format_title('Wind direction')
             cardinal_direction = getWindDirection(value['deg'])
             svalue = f"{cardinal_direction} {SEPTAG} {value['deg']}{DEGREE}"
 
         else:
-            key = format_title(f'Wind {k}')
+            key = format_title(f'Wind {key_thing}')
             tag = 'mph'
 
             if METRIC in units:
                 tag = 'm/s'
 
-            svalue = f'{value[k]}{tag}'
+            svalue = f'{val}{tag}'
 
         print(f'{key:<{LJUST}}{svalue:>{RJUST}}')
 
@@ -880,11 +893,11 @@ def print_snow_rain(key, value, units=None):
         Nothing
     """
     key = format_title(f"{key} volume")
-    for k, v in value.items():
-        cvalue = f'{k}: {v * MM2INCH:.2f}in'
+    for key_thing, value in value.items():
+        cvalue = f'{key_thing}: {value * MM2INCH:.2f}in'
 
         if METRIC in units:
-            cvalue = f'{k}: {v:.2f}mm'
+            cvalue = f'{key_thing}: {value:.2f}mm'
 
         print(f'{key:<{LJUST}}{cvalue:>{RJUST}}')
 
