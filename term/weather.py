@@ -77,7 +77,7 @@ import urllib
 
 try:
     import uszipcode
-    USE_USZIPCODE = True
+    USE_USZIPCODE = False
 
 except ModuleNotFoundError:
     USE_USZIPCODE = False
@@ -85,6 +85,7 @@ except ModuleNotFoundError:
 USE_ARROWS   = True
 QUIT         = 'q'
 DONE         = 'done'
+HELP         = 'help'
 DEGREE       = chr(176)
 HPA2INCH     = .401463
 HPA2CM       = 1.01972
@@ -226,11 +227,25 @@ def welcome():
     print('   - If Celsius is chosen, output is in metric')
     print('   - If Kelvin is chosen, only temps are in Kelvin')
     print()
-    print('Hints:')
-    print(f'    {REPEAT_ENTRY:15} - Repeat last <zip> or <city, state>')
-    print(f'    hist/{HISTORY:10} - Selection from last {MAX_HISTORY} entries')
-    print()
+    help()
     print(f"To Exit: Enter '{QUIT}' or '{DONE}'")
+
+
+def help():
+    """display help system
+    Args: None
+    Returns: Nothing
+    """
+    shistory = 'hist'
+
+    print('Commands:')
+    print(f'    {REPEAT_ENTRY:10} - Repeat last <zip> or <city, state>')
+    print(f'    {HISTORY:10} - Selection from last {MAX_HISTORY} entries')
+    print(f'    {shistory:10} - Selection from last {MAX_HISTORY} entries')
+    print(f'    {HELP:10} - Access help')
+    print(f'    {DONE:10} - Exit Program')
+    print(f'    {QUIT:10} - Exit Program')
+    print()
 
 
 # function: getLocation()
@@ -268,7 +283,7 @@ def requestWeatherLocation(location=None):
         location (string): location city/state || zip
     """
     warn_msg = 'WARNING: Please enter valid <city, state> or <zipcode>'
-    query_str = 'Enter location (<zip> or <city, state>): '
+    query_str = 'Enter location (<zip> or <city, state> or <cmd>): '
 
     print()
     while True:
@@ -278,6 +293,11 @@ def requestWeatherLocation(location=None):
             location = input(query_str).strip()
 
         if not len(location):
+            location = None
+            continue
+
+        if location == HELP:
+            help()
             location = None
             continue
 
@@ -1014,6 +1034,9 @@ def normalize_zipinfo(zipinfo=None):
         elif 'codes' in zipinfo['query']:
             code = zipinfo['query']['codes'][0]
             results = zipinfo['results'][code][0]
+
+        if results['state'] is None or results['city'] is None:
+            return None
 
         data['city'] = results['city']
         data['state'] = getStateAbbreviation(results['state'])
